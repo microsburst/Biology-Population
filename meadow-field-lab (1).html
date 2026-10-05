@@ -1,0 +1,1967 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Meadow Field Lab: Population Models</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ECEFE6; --panel:#FAFBF6; --panel-2:#F0F3EA; --ink:#1B2A20; --muted:#58685B; --line:#D0D8C7; --line-2:#E2E7DA; --grid:#E5EADE;
+  --moss:#3F6E31; --moss-2:#4C853B; --moss-soft:#E0EBD5; --forest:#183325;
+  --tag:#D9661A; --tag-soft:#FBE6D3; --water:#2B6B7D; --red:#B0392A; --red-soft:#F5DDD8; --gold:#9A6C12;
+  --shadow:0 1px 0 rgba(20,40,20,.04),0 8px 20px -14px rgba(20,40,20,.35);
+  --r:14px;
+  --font:'Archivo',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --math:'STIX Two Text','Cambria Math','Times New Roman',serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#111712; --panel:#19211A; --panel-2:#212B22; --ink:#E4ECE0; --muted:#9BAB9D; --line:#2E3A2F; --line-2:#263127; --grid:#232E24;
+    --moss:#5B9746; --moss-2:#6CAE54; --moss-soft:#213320; --forest:#0B1810;
+    --tag:#F08A35; --tag-soft:#3A2614; --water:#62AABC; --red:#E2735F; --red-soft:#3A1F1A; --gold:#D9A947;
+    --shadow:0 1px 0 rgba(0,0,0,.2),0 8px 20px -14px rgba(0,0,0,.6);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#111712; --panel:#19211A; --panel-2:#212B22; --ink:#E4ECE0; --muted:#9BAB9D; --line:#2E3A2F; --line-2:#263127; --grid:#232E24;
+  --moss:#5B9746; --moss-2:#6CAE54; --moss-soft:#213320; --forest:#0B1810;
+  --tag:#F08A35; --tag-soft:#3A2614; --water:#62AABC; --red:#E2735F; --red-soft:#3A1F1A; --gold:#D9A947;
+  --shadow:0 1px 0 rgba(0,0,0,.2),0 8px 20px -14px rgba(0,0,0,.6);
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px);-webkit-text-size-adjust:100%;height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;min-height:100%}
+a{color:inherit}
+[hidden]{display:none!important}
+
+/* ---------- header ---------- */
+.top{background:var(--forest);color:#E7F0E0}
+.top-inner{max-width:1280px;margin:0 auto;padding:18px clamp(14px,3vw,28px) 12px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.brand{display:flex;gap:12px;align-items:center;min-width:0}
+.logo{width:42px;height:42px;flex:none;background:#E7F0E0;border-radius:12px;padding:6px}
+.brand h1{margin:0;font-size:clamp(21px,2.6vw,27px);font-weight:760;font-stretch:86%;letter-spacing:-.01em;line-height:1.1}
+.brand p{margin:3px 0 0;font-size:13px;color:#B8CBAF}
+.brand a{color:#E7F0E0;text-underline-offset:2px;text-decoration-color:rgba(231,240,224,.45)}
+.globals{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.seg{display:flex;align-items:center;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:3px}
+.seg-label{font-size:12.5px;color:#B8CBAF;padding:0 8px 0 6px}
+.seg button{font:600 13px var(--font);color:#D7E4CF;background:none;border:0;border-radius:7px;padding:5px 9px;cursor:pointer}
+.seg button.on{background:#E7F0E0;color:#183325}
+.tbtn{font:600 13px var(--font);color:#E7F0E0;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:7px 12px;cursor:pointer}
+.tbtn:hover{background:rgba(255,255,255,.15)}
+.tbtn.accent{background:#E7F0E0;color:#183325;border-color:transparent}
+.tabs{max-width:1280px;margin:0 auto;padding:0 clamp(14px,3vw,28px);display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tabs button{display:flex;align-items:center;gap:10px;text-align:left;font-family:var(--font);color:#CFE0C6;background:rgba(255,255,255,.06);border:0;border-radius:12px 12px 0 0;padding:10px 16px 11px;cursor:pointer;flex:none}
+.tabs button:hover{background:rgba(255,255,255,.12)}
+.tabs button[aria-selected="true"]{background:var(--bg);color:var(--ink)}
+.tabs b{display:block;font-size:14.5px;font-weight:700;line-height:1.25}
+.tabs small{display:block;font-size:12px;opacity:.78}
+.tk{width:24px;height:24px;border-radius:7px;display:grid;place-items:center;font-size:12.5px;font-weight:700;background:rgba(255,255,255,.13);flex:none}
+.tabs button[aria-selected="true"] .tk{background:var(--moss);color:#fff}
+
+/* ---------- layout ---------- */
+main{max-width:1280px;margin:0 auto;padding:16px clamp(12px,2.5vw,24px) 6px}
+.intro{margin-bottom:12px;max-width:80ch}
+.intro h2{margin:0;font-size:clamp(21px,2.4vw,27px);font-weight:760;font-stretch:88%;letter-spacing:-.01em;line-height:1.15}
+.lede{margin:6px 0 0;color:var(--muted);font-size:15.5px}
+.workspace{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:12px;align-items:start}
+@media (max-width:1020px){.workspace{grid-template-columns:minmax(0,1fr)}}
+.stage-col{display:flex;flex-direction:column;gap:10px;min-width:0}
+.side{display:flex;flex-direction:column;gap:10px;min-width:0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:13px 14px;box-shadow:var(--shadow);min-width:0}
+.card h3{margin:0;font-size:15.5px;font-weight:700;line-height:1.3}
+.card-head{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+.head-actions{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+
+/* ---------- habitat stage ---------- */
+.stage{position:relative;border-radius:var(--r);overflow:hidden;background:#577A36;aspect-ratio:16/10;min-height:300px;max-height:60vh;border:1px solid rgba(0,0,0,.2);box-shadow:var(--shadow)}
+.stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
+.stage.tool{cursor:crosshair}
+@media (max-width:640px){.stage{aspect-ratio:auto;height:min(78vw,430px)}}
+.hud{position:absolute;display:flex;gap:6px;flex-wrap:wrap;pointer-events:none;z-index:2;max-width:calc(100% - 20px)}
+.hud.tl{top:10px;left:10px}.hud.tr{top:10px;right:10px;justify-content:flex-end}.hud.bl{bottom:10px;left:10px}.hud.br{bottom:10px;right:10px;justify-content:flex-end}
+.chip{background:rgba(13,24,15,.76);color:#F1F6EC;font-size:12.5px;padding:5px 9px;border-radius:8px;display:inline-flex;align-items:center;gap:6px;font-variant-numeric:tabular-nums;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+.chip b{font-weight:700}
+.sw{width:11px;height:11px;border-radius:50%;display:inline-block;border:1.5px solid rgba(255,255,255,.85);flex:none}
+@media (max-width:640px){.hud.bl{display:none}}
+.banner{position:absolute;left:50%;top:50px;transform:translateX(-50%);z-index:3;background:rgba(13,24,15,.88);color:#F1F6EC;border-radius:12px;padding:11px 15px;font-size:14px;width:max-content;max-width:min(92%,520px);text-align:center;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+.banner .bar{height:5px;background:rgba(255,255,255,.2);border-radius:4px;margin-top:8px;overflow:hidden}
+.banner .bar i{display:block;height:100%;width:0;background:#9CC46A}
+.banner.warn{background:rgba(112,30,18,.92)}
+.banner .btn{margin-top:9px}
+
+/* ---------- controls ---------- */
+.actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.hint{color:var(--muted);font-size:14px;margin:0;flex:1 1 230px;min-width:0}
+.btn{font:600 14px var(--font);color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:9px 14px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:7px;line-height:1.2}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--moss);border-color:var(--moss);color:#fff}
+.btn.primary:hover{background:var(--moss-2);border-color:var(--moss-2)}
+.btn.lg{padding:12px 18px;font-size:15px;min-width:200px}
+.btn.sm{padding:6px 10px;font-size:13px;border-radius:9px}
+.btn.ghost{background:transparent}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+:focus-visible{outline:2.5px solid var(--tag);outline-offset:2px}
+.stepper{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;list-style:none;margin:0;padding:0}
+.stepper li{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:10px;background:var(--panel);border:1px solid var(--line);font-size:13px;color:var(--muted);min-width:0}
+.stepper .n{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:12px;background:var(--panel-2);border:1px solid var(--line);flex:none}
+.stepper .t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.stepper li.now{border-color:var(--moss);color:var(--ink);background:var(--moss-soft);font-weight:600}
+.stepper li.now .n{background:var(--moss);color:#fff;border-color:var(--moss)}
+.stepper li.done{color:var(--ink)}
+.stepper li.done .n{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+@media (max-width:700px){.stepper .t{display:none}.stepper li.now .t{display:inline}.stepper{grid-template-columns:repeat(5,auto)}.stepper li{justify-content:center}}
+
+.field{margin-top:10px}
+.field:first-child{margin-top:6px}
+.field-top{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.field label{font-size:14px;font-weight:600}
+.field output{font-size:14px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--moss-2);text-align:right;white-space:nowrap}
+.field-hint{font-size:12.5px;color:var(--muted);margin-top:1px}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:24px;background:transparent;margin:4px 0 0;cursor:pointer;--p:50%}
+input[type=range]::-webkit-slider-runnable-track{height:6px;border-radius:6px;background:linear-gradient(to right,var(--moss) var(--p),var(--line) var(--p))}
+input[type=range]::-moz-range-track{height:6px;border-radius:6px;background:var(--line)}
+input[type=range]::-moz-range-progress{height:6px;border-radius:6px;background:var(--moss)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:#fff;border:2px solid var(--moss);margin-top:-7px;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:#fff;border:2px solid var(--moss);box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.toggle{display:inline-flex;gap:8px;align-items:center;font-size:14px;font-weight:600;cursor:pointer;user-select:none}
+.toggle input,.check input{width:18px;height:18px;accent-color:var(--moss);flex:none}
+.check{display:flex;gap:9px;align-items:flex-start;margin-top:16px;font-size:13.5px;cursor:pointer;color:var(--ink)}
+.check input{margin-top:1px}
+.select{font:600 13px var(--font);color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:6px 8px}
+
+/* ---------- typeset formulas ---------- */
+.math{font-family:var(--math);font-size:22px;line-height:1.3;display:flex;align-items:center;flex-wrap:wrap;gap:.22em;color:var(--ink)}
+.math.big{font-size:30px;justify-content:center;padding:6px 0 4px}
+.math i{font-style:italic}
+.math b{font-weight:600;font-variant-numeric:tabular-nums lining-nums}
+.frac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1.12}
+.frac>span:first-child{border-bottom:1.5px solid currentColor;padding:0 .22em .1em}
+.frac>span:last-child{padding:.1em .22em 0}
+.math.sub{font-size:20px;background:var(--panel-2);border-radius:10px;padding:8px 11px;margin-top:8px;min-height:54px}
+.math .eq{color:var(--muted);padding:0 .05em}
+.math .res{background:var(--panel);border:1.5px solid var(--moss);border-radius:7px;padding:0 .3em}
+.math .unit{font-family:var(--font);font-size:13px;color:var(--muted);font-style:normal}
+.cs{color:var(--tag)!important}.cn{color:var(--water)!important}.cx{color:var(--red)!important}.cr{color:var(--gold)!important}.cK{color:var(--red)!important}.cN{color:var(--moss-2)!important}
+.vars{list-style:none;margin:4px 0 0;padding:0;display:grid;gap:5px;font-size:13.5px;color:var(--muted)}
+.vars li{display:grid;grid-template-columns:54px 1fr;align-items:baseline;gap:4px}
+.vars li>i,.vars li>.v{font-family:var(--math);font-size:18px;font-style:italic;color:var(--ink)}
+.why{font-size:13px;color:var(--muted);margin:10px 0 0}
+.sub-note{font-size:13.5px;color:var(--ink);margin:7px 0 0;font-weight:600}
+.sub-note:empty{display:none}
+
+/* ---------- readouts ---------- */
+.kv{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.kv>div{background:var(--panel-2);border-radius:10px;padding:7px 10px;min-width:0}
+.kv .k{font-size:12.5px;color:var(--muted);line-height:1.3}
+.kv .v{font-size:21px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.kv .v small{font-size:12.5px;font-weight:600;color:var(--muted)}
+.kv .wide{grid-column:1/-1}
+.badge{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:600;padding:5px 11px;border-radius:999px;background:var(--panel-2);border:1px solid var(--line);color:var(--ink)}
+.badge i{width:9px;height:9px;border-radius:50%;background:var(--muted);flex:none}
+.badge.good{background:var(--moss-soft);border-color:var(--moss)}.badge.good i{background:var(--moss-2)}
+.badge.warn{background:var(--tag-soft);border-color:var(--tag)}.badge.warn i{background:var(--tag)}
+.badge.bad{background:var(--red-soft);border-color:var(--red)}.badge.bad i{background:var(--red)}
+.hud .badge{background:rgba(13,24,15,.78);color:#F1F6EC;border-color:rgba(255,255,255,.2)}
+.meter{height:9px;background:var(--line);border-radius:6px;overflow:hidden;margin-top:7px}
+.meter i{display:block;height:100%;background:var(--moss-2);transition:width .25s}
+
+/* ---------- analysis ---------- */
+.analysis{display:grid;gap:10px;margin-top:10px}
+.charts3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+@media (max-width:920px){.charts3{grid-template-columns:minmax(0,1fr)}}
+#log-charts{container-type:inline-size}
+@container (max-width:640px){.charts3{grid-template-columns:minmax(0,1fr)}}
+.chart-title{font-size:13.5px;font-weight:650;margin:0}
+.chart-sub{font-size:12.5px;color:var(--muted);margin:0 0 2px}
+.chart-box{position:relative;height:215px}
+.chart-box.tall{height:250px}
+.chart-box canvas{position:absolute;inset:0;width:100%;height:100%}
+.split{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:12px;align-items:start}
+@media (max-width:820px){.split{grid-template-columns:minmax(0,1fr)}}
+.muted{color:var(--muted)}.small{font-size:13.5px}
+p.small{margin:0 0 6px}
+.table-wrap{overflow:auto;max-height:340px;border:1px solid var(--line-2);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:13.5px;font-variant-numeric:tabular-nums}
+th,td{padding:7px 11px;text-align:right;border-bottom:1px solid var(--line-2);white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+th{position:sticky;top:0;background:var(--panel-2);font-weight:650;font-size:12.5px;color:var(--muted);z-index:1}
+tbody tr:last-child td{border-bottom:0}
+td.good{color:var(--moss-2);font-weight:650}td.bad{color:var(--red);font-weight:650}
+.empty{padding:20px;text-align:center;color:var(--muted);font-size:13.5px}
+.statlist{display:grid;grid-template-columns:1fr auto;gap:7px 14px;font-size:14px;margin:0;align-content:start}
+.statlist dt{color:var(--muted)}
+.statlist dd{margin:0;font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
+.statlist .em{grid-column:1/-1;font-size:13.5px;color:var(--ink);background:var(--panel-2);border-radius:9px;padding:9px 11px;margin-top:4px;font-weight:500}
+
+/* ---------- notes ---------- */
+.notes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:10px}
+@media (max-width:1020px){.notes{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:600px){.notes{grid-template-columns:minmax(0,1fr)}}
+.notes .card{box-shadow:none;background:var(--panel-2);border-color:var(--line-2)}
+.notes h4{margin:0 0 6px;font-size:14.5px}
+.notes p,.notes li{font-size:13.5px}
+.notes p{margin:0}
+.notes ul{margin:0;padding-left:18px}
+.notes li{margin-bottom:5px}
+.notes .demo{border-color:var(--moss);background:var(--moss-soft)}
+
+/* ---------- ecosystem toolbar ---------- */
+.toolbar{display:flex;gap:10px 22px;flex-wrap:wrap;align-items:center}
+.group{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.group>span{font-size:13px;color:var(--muted);font-weight:600;margin-right:2px}
+.pill{font:600 13px var(--font);color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:6px 12px;cursor:pointer}
+.pill:hover{border-color:var(--muted)}
+.pill[aria-pressed="true"]{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+.pill.ev{background:var(--panel-2)}
+.chain{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:14px;font-weight:600}
+.chain span{background:var(--panel-2);border-radius:8px;padding:5px 9px}
+.chain em{font-style:normal;color:var(--muted)}
+
+/* ---------- tour, toast, footer ---------- */
+.tour-spot{position:fixed;z-index:48;border-radius:14px;box-shadow:0 0 0 3px var(--tag),0 0 0 9999px rgba(8,16,10,.58);pointer-events:none;transition:left .3s,top .3s,width .3s,height .3s}
+.tour{position:fixed;z-index:50;width:min(380px,calc(100% - 24px));background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:16px;box-shadow:0 22px 50px -12px rgba(0,0,0,.55);padding:14px 16px;transition:left .3s,top .3s}
+.tour-prog{height:4px;background:var(--line-2);border-radius:4px;overflow:hidden;margin-bottom:9px}
+.tour-prog i{display:block;height:100%;background:var(--tag);transition:width .3s}
+.tour-where{margin:0;font-size:12.5px;font-weight:650;color:var(--tag)}
+.tour h4{margin:1px 0 0;font-size:16.5px}
+.tour p#tour-text{margin:5px 0 12px;font-size:14.5px;color:var(--muted)}
+.tour-row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.tour-count{font-size:13px;color:var(--muted)}
+.toast{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--panel);padding:10px 14px;border-radius:10px;font-size:14px;z-index:60;opacity:0;transform:translateY(8px);transition:opacity .2s,transform .2s;pointer-events:none;max-width:calc(100% - 32px)}
+.toast.show{opacity:1;transform:none}
+footer{max-width:1280px;margin:16px auto 0;padding:16px clamp(14px,3vw,28px) 26px;color:var(--muted);font-size:13px;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;border-top:1px solid var(--line)}
+footer a{color:var(--ink)}
+kbd{font:600 12px var(--font);background:var(--panel);border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:1px 5px;color:var(--ink)}
+.refs{margin:16px 0 0}
+.refs ol{margin:8px 0 0;padding-left:22px;font-size:13.5px;color:var(--muted);display:grid;gap:4px}
+.refs i{color:var(--ink)}
+/* presentation mode: bigger, calmer, for a projector */
+body.present{font-size:17px}
+body.present .lede,body.present .notes,body.present .refs,body.present footer,body.present .field-hint,body.present .why,body.present .vars,body.present #mr-log-card,body.present #exp-table-card,body.present .hud.bl,body.present .hint,body.present .tabs small,body.present .brand p{display:none!important}
+body.present .stage{max-height:68vh}
+body.present .math.big{font-size:38px}
+body.present .math.sub{font-size:24px}
+body.present .kv .v{font-size:26px}
+body.present .intro h2{font-size:clamp(24px,2.8vw,32px)}
+body.present .chip{font-size:15px;padding:6px 11px}
+body.present .btn.lg{font-size:17px;padding:14px 22px}
+body.present .card h3{font-size:17px}
+#presentBtn[aria-pressed="true"]{background:var(--tag);border-color:transparent;color:#fff}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-inner">
+    <div class="brand">
+      <svg class="logo" viewBox="0 0 32 32" aria-hidden="true"><path d="M5 27C5 15 13 6 28 4c-1 14-9 23-23 23z" fill="#8DBA5A"/><path d="M6.5 25.5C11 18 17 12 24.5 7.5" stroke="#183325" stroke-width="1.8" fill="none" stroke-linecap="round"/><path d="M12 19.5l-3.5-3M16 15.5l-2-4.5M15 16.5l5 .5" stroke="#183325" stroke-width="1.3" stroke-linecap="round"/></svg>
+      <div>
+        <h1>Meadow Field Lab</h1>
+        <p>Population models for G9 Biology, adapted from the <a href="https://virtualbiologylab.org/population-ecology/" target="_blank" rel="noopener">Virtual Biology Lab</a></p>
+      </div>
+    </div>
+    <div class="globals" id="globals">
+      <div class="seg" id="speedSeg" role="group" aria-label="Simulation speed">
+        <span class="seg-label">Speed</span>
+        <button type="button" data-speed="0.5">½×</button><button type="button" data-speed="1" class="on">1×</button><button type="button" data-speed="2">2×</button><button type="button" data-speed="4">4×</button>
+      </div>
+      <button type="button" class="tbtn" id="soundBtn" aria-pressed="true">Sound on</button>
+      <button type="button" class="tbtn" id="themeBtn">Dark mode</button>
+      <button type="button" class="tbtn" id="presentBtn" aria-pressed="false">Presentation mode</button>
+      <button type="button" class="tbtn accent" id="tourBtn">Guided tour</button>
+    </div>
+  </div>
+  <nav class="tabs" role="tablist" id="tabs" aria-label="Simulations">
+    <button type="button" role="tab" id="t-mr" data-tab="mr" aria-selected="true"><span class="tk">1</span><span><b>Mark–recapture</b><small>Option 1: estimate a population</small></span></button>
+    <button type="button" role="tab" id="t-exp" data-tab="exp" aria-selected="false"><span class="tk">2</span><span><b>Exponential growth</b><small>Option 2: the J-curve</small></span></button>
+    <button type="button" role="tab" id="t-log" data-tab="log" aria-selected="false"><span class="tk">3</span><span><b>Logistic growth</b><small>Option 3: the S-curve</small></span></button>
+    <button type="button" role="tab" id="t-eco" data-tab="eco" aria-selected="false"><span class="tk">4</span><span><b>Whole ecosystem</b><small>Extension: food chain</small></span></button>
+  </nav>
+</header>
+
+<main>
+
+<!-- ===================== OPTION 1: MARK-RECAPTURE ===================== -->
+<section class="tabpanel" id="tab-mr" role="tabpanel" aria-labelledby="t-mr">
+  <div class="intro">
+    <h2>Mark–recapture: estimating a population you can't count</h2>
+    <p class="lede">Bio-blobs hide in long grass, so nobody can count them one by one. Catch a sample, tag it, let it go, then catch a second sample. The share of tagged blobs in the second catch tells you how big the whole population is.</p>
+  </div>
+  <div class="workspace">
+    <div class="stage-col">
+      <ol class="stepper" id="mr-steps" aria-label="Method steps">
+        <li><span class="n">1</span><span class="t">First capture (s)</span></li>
+        <li><span class="n">2</span><span class="t">Tag them</span></li>
+        <li><span class="n">3</span><span class="t">Release and mix</span></li>
+        <li><span class="n">4</span><span class="t">Second capture (n)</span></li>
+        <li><span class="n">5</span><span class="t">Count tagged (x)</span></li>
+      </ol>
+      <div class="stage" id="mr-stage">
+        <canvas id="mr-canvas" role="img" aria-label="Meadow with blobs, traps and a holding pen"></canvas>
+        <div class="hud tl"><span class="chip">In the meadow: <b id="mr-c-total">–</b></span><span class="chip"><span class="sw" style="background:#FFC23A;border-color:#E2463A"></span>Tagged in meadow: <b id="mr-c-tag">0</b></span></div>
+        <div class="hud bl"><span class="chip"><span class="sw" style="background:#4FC0F0"></span>Bio-blob</span><span class="chip"><span class="sw" style="background:#FFC23A;border-color:#E2463A"></span>Tag</span><span class="chip"><span class="sw" style="background:transparent;border:2.5px solid #FF4F3C"></span>Recaptured with tag</span><span class="chip"><span class="sw" style="background:#A9B1B4;border-radius:2px"></span>Trap</span></div>
+        <div class="banner" id="mr-banner" hidden><span id="mr-banner-text">Tagged blobs are spreading out</span><div class="bar"><i id="mr-bar"></i></div></div>
+      </div>
+      <div class="actions" id="mr-actions">
+        <button type="button" class="btn primary lg" id="mr-next">Step 1: Catch blobs</button>
+        <button type="button" class="btn" id="mr-auto">Auto-play trial</button>
+        <button type="button" class="btn ghost" id="mr-reset">New population</button>
+        <p class="hint" id="mr-hint"></p>
+      </div>
+      <div class="card" id="mr-batch-card">
+      <div class="card-head"><h3>Repeated trials and random sampling error</h3>
+        <div class="head-actions">
+          <select class="select" id="mr-trials" aria-label="Number of trials"><option value="20">20 trials</option><option value="100" selected>100 trials</option><option value="500">500 trials</option><option value="1000">1,000 trials</option></select>
+          <button type="button" class="btn sm primary" id="mr-batch">Run trials</button>
+          <button type="button" class="btn sm" id="mr-batch-copy">Copy</button>
+          <button type="button" class="btn sm" id="mr-batch-csv">Download CSV</button>
+        </div>
+      </div>
+      <p class="muted small">Repeats the whole method instantly with the current settings, assuming tagged blobs are fully mixed. Each bar counts how many trials gave that estimate. A wide spread means more random sampling error. Try small samples, then large ones.</p>
+      <div class="split"><div class="chart-box tall"><canvas id="mr-hist"></canvas></div><dl class="statlist" id="mr-batch-stats"></dl></div>
+    </div>
+    <div class="card" id="mr-log-card">
+      <div class="card-head"><h3>Trial log</h3><div class="head-actions"><button type="button" class="btn sm" id="mr-log-copy">Copy</button><button type="button" class="btn sm" id="mr-log-csv">Download CSV</button><button type="button" class="btn sm ghost" id="mr-log-clear">Clear</button></div></div>
+      <div class="table-wrap"><table id="mr-log"></table></div>
+    </div>
+    </div>
+    <aside class="side">
+      <div class="card" id="mr-formula">
+        <h3>Lincoln–Petersen estimate</h3>
+        <div class="math big"><i>N</i><span class="eq">=</span><span class="frac"><span><i class="cs">s</i> × <i class="cn">n</i></span><span><i class="cx">x</i></span></span></div>
+        <ul class="vars">
+          <li><i class="cs">s</i><span>blobs caught and tagged in the first capture</span></li>
+          <li><i class="cn">n</i><span>total blobs caught in the second capture</span></li>
+          <li><i class="cx">x</i><span>tagged blobs found in the second capture</span></li>
+        </ul>
+        <div class="math sub" id="mr-sub"></div>
+        <p class="sub-note" id="mr-sub-note"></p>
+        <p class="why">Why it works: if tagged blobs mix evenly, the tagged share of the second catch (x/n) matches the tagged share of the whole meadow (s/N).</p>
+      </div>
+      <div class="card" id="mr-settings">
+        <h3>Field settings</h3>
+        <div id="mr-sliders"></div>
+        <label class="check"><input type="checkbox" id="mr-hide"><span>Hide the true population, so you estimate it blind like a real ecologist</span></label>
+      </div>
+      <div class="card" id="mr-trial-card">
+        <div class="card-head"><h3>This trial</h3><span class="badge" id="mr-trialno">Trial 1</span></div>
+        <div class="kv">
+          <div><div class="k">Tagged first (s)</div><div class="v cs" id="mr-r-s">–</div></div>
+          <div><div class="k">Caught second (n)</div><div class="v cn" id="mr-r-n">–</div></div>
+          <div><div class="k">Tagged in 2nd catch (x)</div><div class="v cx" id="mr-r-x">–</div></div>
+          <div><div class="k">Estimated N</div><div class="v" id="mr-r-est">–</div></div>
+          <div><div class="k">True N</div><div class="v" id="mr-r-true">–</div></div>
+          <div><div class="k">Error</div><div class="v" id="mr-r-err">–</div></div>
+        </div>
+      </div>
+    </aside>
+  </div>
+  <div class="notes" id="mr-notes"></div>
+</section>
+
+<!-- ===================== OPTION 2: EXPONENTIAL ===================== -->
+<section class="tabpanel" id="tab-exp" role="tabpanel" aria-labelledby="t-exp" hidden>
+  <div class="intro">
+    <h2>Exponential growth: blobs with no limits</h2>
+    <p class="lede">A few blobs arrive in a huge meadow with plenty of food and no predators. Every blob reproduces at the same rate, so the more blobs there are, the faster their number climbs.</p>
+  </div>
+  <div class="workspace">
+    <div class="stage-col">
+      <div class="stage" id="exp-stage">
+        <canvas id="exp-canvas" role="img" aria-label="Meadow with a growing blob population"></canvas>
+        <div class="hud tl"><span class="chip">Time <b id="exp-c-t">0.0</b> months</span><span class="chip">Population <b id="exp-c-N">10</b> blobs</span></div>
+        <div class="hud br"><span class="chip" id="exp-c-cap" hidden></span></div>
+        <div class="banner warn" id="exp-banner" hidden><b>20,000 blobs.</b> The simulation stops here. In a real meadow, food, space, disease and predators would have slowed this growth long before now.<br><button type="button" class="btn sm" id="exp-to-log">Open logistic growth</button></div>
+      </div>
+      <div class="actions" id="exp-actions">
+        <button type="button" class="btn primary lg" id="exp-play">Start growth</button>
+        <button type="button" class="btn" id="exp-reset">Reset and save run</button>
+        <label class="toggle"><input type="checkbox" id="exp-log"> Log scale</label>
+        <p class="hint" id="exp-hint">Press Start and watch the curve bend upward.</p>
+      </div>
+      <div class="card" id="exp-chart-card">
+        <div class="card-head"><h3>Population over time: the J-curve</h3><span class="muted small">Solid: this run. Dashed: N₀e<sup>rt</sup> prediction. Faded: saved runs.</span></div>
+        <div class="chart-box tall"><canvas id="exp-chart"></canvas></div>
+      </div>
+      <div class="card" id="exp-table-card">
+      <div class="card-head"><h3>Compare rates of population increase</h3><div class="head-actions"><button type="button" class="btn sm" id="exp-copy">Copy</button><button type="button" class="btn sm" id="exp-csv">Download CSV</button><button type="button" class="btn sm ghost" id="exp-clear">Clear saved runs</button></div></div>
+      <p class="muted small">Every reset saves the run here and as a faded curve on the chart. Keep N₀ and d the same and try b = 0.3, then 0.5, then 0.7.</p>
+      <div class="table-wrap"><table id="exp-table"></table></div>
+    </div>
+    </div>
+    <aside class="side" id="exp-side">
+      <div class="card" id="exp-formula">
+        <h3>Exponential growth model</h3>
+        <div class="math big"><span class="frac"><span>d<i>N</i></span><span>d<i>t</i></span></span><span class="eq">=</span><i class="cr">r</i><i class="cN">N</i></div>
+        <ul class="vars">
+          <li><span class="v">dN/dt</span><span>growth rate: new blobs per month</span></li>
+          <li><i class="cr">r</i><span>intrinsic growth rate: r = b − d, the birth rate minus the death rate per blob</span></li>
+          <li><i class="cN">N</i><span>population size right now</span></li>
+        </ul>
+        <div class="math sub" id="exp-sub"></div>
+        <div class="math sub" id="exp-sub2"></div>
+      </div>
+      <div class="card"><h3>Controls</h3><div id="exp-sliders"></div></div>
+      <div class="card">
+        <h3 style="margin-bottom:10px">Readouts</h3>
+        <div class="kv">
+          <div><div class="k">Population N</div><div class="v cN" id="exp-k-N">–</div></div>
+          <div><div class="k">Growth now (dN/dt)</div><div class="v" id="exp-k-g">–</div></div>
+          <div><div class="k">Doubling time, ln 2 / r</div><div class="v" id="exp-k-td">–</div></div>
+          <div><div class="k">Doubling time, observed</div><div class="v" id="exp-k-tdo">–</div></div>
+          <div><div class="k">Time to reach 1,000</div><div class="v" id="exp-k-1k">–</div></div>
+          <div><div class="k">Months elapsed</div><div class="v" id="exp-k-t">–</div></div>
+        </div>
+      </div>
+    </aside>
+  </div>
+  <div class="notes" id="exp-notes"></div>
+</section>
+
+<!-- ===================== OPTION 3: LOGISTIC ===================== -->
+<section class="tabpanel" id="tab-log" role="tabpanel" aria-labelledby="t-log" hidden>
+  <div class="intro">
+    <h2>Logistic growth: blobs in a meadow with limits</h2>
+    <p class="lede">This meadow can only feed a certain number of blobs: its carrying capacity, K. As the population grows the grass gets grazed down, so growth slows and the population levels off. Births and deaths keep happening, they just balance out.</p>
+  </div>
+  <div class="workspace">
+    <div class="stage-col">
+      <div class="stage" id="log-stage">
+        <canvas id="log-canvas" role="img" aria-label="Meadow where blobs graze down the grass as they approach carrying capacity"></canvas>
+        <div class="hud tl"><span class="chip">Time <b id="log-c-t">0.0</b> months</span><span class="chip">N = <b id="log-c-N">10</b></span><span class="chip">K = <b id="log-c-K">300</b></span></div>
+        <div class="hud tr"><span class="badge" id="log-status"><i></i><span>Ready</span></span></div>
+        <div class="hud bl"><span class="chip"><span class="sw" style="background:transparent;border:2px solid #B9F27C"></span>Birth</span><span class="chip"><span class="sw" style="background:transparent;border:2px solid #E7E2D6"></span>Death</span><span class="chip"><span class="sw" style="background:#9A7A52"></span>Grazed ground</span></div>
+      </div>
+      <div class="actions">
+        <button type="button" class="btn primary lg" id="log-play">Start growth</button>
+        <button type="button" class="btn" id="log-reset">Reset</button>
+        <div class="group" id="log-events"><span>Environment</span>
+          <button type="button" class="btn sm" id="log-drought">Drought: K −40%</button>
+          <button type="button" class="btn sm" id="log-wet">Good season: K +40%</button>
+          <button type="button" class="btn sm ghost" id="log-undo">Original K</button>
+        </div>
+        <p class="hint" id="log-hint">Press Start. Watch the growth slow as N gets close to K.</p>
+      </div>
+      <div class="card" id="log-charts">
+      <div class="card-head"><h3>Graph analysis</h3><div class="head-actions"><button type="button" class="btn sm" id="log-copy">Copy data</button><button type="button" class="btn sm" id="log-csv">Download CSV</button></div></div>
+      <div class="charts3">
+        <div><p class="chart-title">1. Population against time</p><p class="chart-sub">The S-curve levels off at K</p><div class="chart-box"><canvas id="log-ch1"></canvas></div></div>
+        <div><p class="chart-title">2. Growth rate against population</p><p class="chart-sub">Fastest growth at N = K/2</p><div class="chart-box"><canvas id="log-ch2"></canvas></div></div>
+        <div><p class="chart-title">3. Birth and death rates per blob</p><p class="chart-sub">Births fall and deaths rise with crowding; they cross at K</p><div class="chart-box"><canvas id="log-ch3"></canvas></div></div>
+      </div>
+    </div>
+    </div>
+    <aside class="side" id="log-side">
+      <div class="card" id="log-formula">
+        <h3>Logistic growth model</h3>
+        <div class="math big"><span class="frac"><span>d<i>N</i></span><span>d<i>t</i></span></span><span class="eq">=</span><i class="cr">r</i><i class="cN">N</i><span class="frac"><span>(<i class="cK">K</i> − <i class="cN">N</i>)</span><span><i class="cK">K</i></span></span></div>
+        <ul class="vars">
+          <li><i class="cK">K</i><span>carrying capacity: the most blobs the meadow can support</span></li>
+          <li><span class="v">(K−N)/K</span><span>room left to grow; shrinks to 0 as N reaches K</span></li>
+          <li><i class="cr">r</i><span>intrinsic growth rate when there is no crowding</span></li>
+        </ul>
+        <div class="math sub" id="log-sub"></div>
+        <p class="sub-note" id="log-sub-note"></p>
+      </div>
+      <div class="card"><h3>Controls</h3><div id="log-sliders"></div></div>
+      <div class="card">
+        <h3 style="margin-bottom:10px">Readouts</h3>
+        <div class="kv">
+          <div><div class="k">Population N</div><div class="v cN" id="log-k-N">–</div></div>
+          <div><div class="k">N as % of K</div><div class="v" id="log-k-pct">–</div></div>
+          <div><div class="k">Births per month</div><div class="v" id="log-k-b">–</div></div>
+          <div><div class="k">Deaths per month</div><div class="v" id="log-k-d">–</div></div>
+          <div><div class="k">Time to reach K/2</div><div class="v" id="log-k-half">–</div></div>
+          <div><div class="k">Time to reach 95% of K</div><div class="v" id="log-k-95">–</div></div>
+          <div class="wide"><div class="k">Room left to grow, (K − N) / K: <b id="log-k-res">1.00</b></div><div class="meter"><i id="log-meter" style="width:100%"></i></div></div>
+        </div>
+      </div>
+    </aside>
+  </div>
+  <div class="notes" id="log-notes"></div>
+</section>
+
+<!-- ===================== EXTENSION: ECOSYSTEM ===================== -->
+<section class="tabpanel" id="tab-eco" role="tabpanel" aria-labelledby="t-eco" hidden>
+  <div class="intro">
+    <h2>Whole ecosystem: grass, blobs and foxes</h2>
+    <p class="lede">An extension that shows where carrying capacity comes from. Grass feeds the blobs and blobs feed the foxes, so each population limits the next one. Click on the meadow to add animals or plant grass.</p>
+  </div>
+  <div class="card" id="eco-toolbar" style="margin-bottom:10px">
+    <div class="toolbar">
+      <div class="group" id="eco-biomes"><span>Habitat</span><button type="button" class="pill" data-biome="grassland" aria-pressed="true">Grassland</button><button type="button" class="pill" data-biome="rainforest" aria-pressed="false">Rainforest</button><button type="button" class="pill" data-biome="desert" aria-pressed="false">Desert</button></div>
+      <div class="group" id="eco-tools"><span>Click to</span><button type="button" class="pill" data-tool="rabbit" aria-pressed="true">Add blobs</button><button type="button" class="pill" data-tool="fox" aria-pressed="false">Add foxes</button><button type="button" class="pill" data-tool="grass" aria-pressed="false">Plant grass</button><button type="button" class="pill" data-tool="remove" aria-pressed="false">Remove animals</button></div>
+      <div class="group" id="eco-events"><span>Events</span><button type="button" class="pill ev" data-ev="drought">Drought</button><button type="button" class="pill ev" data-ev="fire">Wildfire</button><button type="button" class="pill ev" data-ev="disease">Blob disease</button><button type="button" class="pill ev" data-ev="rain">Heavy rain</button></div>
+    </div>
+  </div>
+  <div class="workspace">
+    <div class="stage-col">
+      <div class="stage tool" id="eco-stage">
+        <canvas id="eco-canvas" role="img" aria-label="Ecosystem with grass, blobs and foxes"></canvas>
+        <div class="hud tl"><span class="chip">Time <b id="eco-c-t">0</b></span><span class="chip">Blobs <b id="eco-c-r">0</b></span><span class="chip">Foxes <b id="eco-c-f">0</b></span><span class="chip">Grass cover <b id="eco-c-g">0%</b></span></div>
+        <div class="banner" id="eco-banner" hidden></div>
+      </div>
+      <div class="actions">
+        <button type="button" class="btn primary lg" id="eco-play">Start ecosystem</button>
+        <button type="button" class="btn" id="eco-reset">Reset</button>
+        <p class="hint">Tip: untick “Animals can move in” and remove every fox. Blobs boom, strip the grass, crash, then swing around a level the grass can support. That overshoot is the time-lag limitation of the logistic model.</p>
+      </div>
+      <div class="card" id="eco-chart-card">
+        <div class="card-head"><h3>Populations over time</h3><div class="head-actions"><button type="button" class="btn sm" id="eco-copy">Copy data</button><button type="button" class="btn sm" id="eco-csv">Download CSV</button></div></div>
+        <div class="chart-box tall"><canvas id="eco-chart"></canvas></div>
+      </div>
+    </div>
+    <aside class="side">
+      <div class="card">
+        <h3 style="margin-bottom:10px">Food chain</h3>
+        <div class="chain"><span>Grass</span><em>eaten by</em><span>Blobs</span><em>eaten by</em><span>Foxes</span></div>
+        <p class="why">Energy flows up the chain. Animals reproduce when they have eaten enough and die if they starve or grow old.</p>
+      </div>
+      <div class="card" id="eco-settings"><h3>Ecosystem settings</h3><div id="eco-sliders"></div><label class="check"><input type="checkbox" id="eco-migrate" checked><span>Animals can move in from nearby meadows if one species dies out here</span></label></div>
+    </aside>
+  </div>
+  <div class="notes" id="eco-notes"></div>
+</section>
+
+<section class="card refs" id="refs" aria-labelledby="refs-title">
+  <h3 id="refs-title">References</h3>
+  <ol>
+    <li>Virtual Biology Lab. <i>Population Ecology</i> models. virtualbiologylab.org/population-ecology/ (layout and graphs of the growth models adapted from here).</li>
+    <li>Petersen, C. G. J. (1896). The yearly immigration of young plaice into the Limfjord from the German Sea. <i>Report of the Danish Biological Station</i>, 6, 1–48.</li>
+    <li>Lincoln, F. C. (1930). <i>Calculating waterfowl abundance on the basis of banding returns.</i> USDA Circular 118.</li>
+    <li>Chapman, D. G. (1951). Some properties of the hypergeometric distribution with applications to zoological sample censuses. <i>University of California Publications in Statistics</i>, 1, 131–160.</li>
+    <li>Verhulst, P.-F. (1838). Notice sur la loi que la population suit dans son accroissement. <i>Correspondance mathématique et physique</i>, 10, 113–121.</li>
+    <li>Lotka, A. J. (1925). <i>Elements of Physical Biology.</i> Williams &amp; Wilkins.</li>
+    <li>Volterra, V. (1926). Fluctuations in the abundance of a species considered mathematically. <i>Nature</i>, 118, 558–560.</li>
+    <li>Wilensky, U. (1997). <i>NetLogo Wolf Sheep Predation model.</i> Center for Connected Learning and Computer-Based Modeling, Northwestern University (idea of chance-based breeding in the ecosystem).</li>
+  </ol>
+</section>
+</main>
+
+<footer id="site-footer">
+  <span>Models adapted from the Population Ecology models at <a href="https://virtualbiologylab.org/population-ecology/" target="_blank" rel="noopener">virtualbiologylab.org</a>. Built for the G9 Biology population models project.</span>
+  <span>Keys: <kbd>1</kbd>–<kbd>4</kbd> switch tabs, <kbd>Space</kbd> start or next step, <kbd>R</kbd> reset, <kbd>P</kbd> presentation mode</span>
+</footer>
+
+<div class="tour-spot" id="tour-spot" hidden></div>
+<div class="tour" id="tour" hidden role="dialog" aria-live="polite" aria-labelledby="tour-title">
+  <div class="tour-prog"><i id="tour-bar"></i></div>
+  <p class="tour-where" id="tour-where"></p>
+  <h4 id="tour-title"></h4>
+  <p id="tour-text"></p>
+  <div class="tour-row">
+    <span class="tour-count" id="tour-count"></span>
+    <div class="head-actions"><button type="button" class="btn sm ghost" id="tour-close">Close</button><button type="button" class="btn sm" id="tour-prev">Back</button><button type="button" class="btn sm primary" id="tour-next">Next</button></div>
+  </div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+'use strict';
+/* =====================================================================
+   Meadow Field Lab — shared engine
+   ===================================================================== */
+
+/* ---------- small helpers ---------- */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const TAU = Math.PI * 2;
+const rand = (a, b) => a + Math.random() * (b - a);
+const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
+const val = id => +document.getElementById(id).value;
+function gauss() { let u = 0, v = 0; while (!u) u = Math.random(); while (!v) v = Math.random(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(TAU * v); }
+/* random number of events when `l` are expected (Poisson) */
+function poisson(l) {
+  if (!(l > 0)) return 0;
+  if (l < 30) { const L = Math.exp(-l); let k = 0, p = 1; do { k++; p *= Math.random(); } while (p > L); return k - 1; }
+  return Math.max(0, Math.round(l + Math.sqrt(l) * gauss()));
+}
+function mulberry32(a) { return function () { a |= 0; a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+const fmt = (v, d = 0) => (Number.isFinite(v) ? Number(v).toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d }) : '–');
+function tickLabel(v) {
+  const a = Math.abs(v);
+  if (a >= 1e6) return (v / 1e6).toFixed(a >= 1e7 ? 0 : 1).replace(/\.0$/, '') + 'M';
+  if (a >= 1e4) return (v / 1e3).toFixed(a >= 1e5 ? 0 : 1).replace(/\.0$/, '') + 'k';
+  if (a >= 1000) return fmt(v);
+  if (a === 0) return '0';
+  if (a < 1) return String(+v.toFixed(2));
+  return String(+v.toFixed(1));
+}
+const cssv = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+let TH = {};
+function readTheme() {
+  TH = { ink: cssv('--ink'), muted: cssv('--muted'), line: cssv('--line'), grid: cssv('--grid'), panel: cssv('--panel'),
+    moss: cssv('--moss-2'), tag: cssv('--tag'), water: cssv('--water'), red: cssv('--red'), gold: cssv('--gold'),
+    font: cssv('--font') || 'system-ui, sans-serif' };
+}
+
+/* ---------- global state ---------- */
+const G = { tab: 'mr', speed: 1, sound: true, last: null, uiT: 0, chartT: 0 };
+
+/* ---------- toast, copy, CSV ---------- */
+let toastTimer = 0;
+function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 2400); }
+function toDelimited(rows, sep) {
+  return rows.map(r => r.map(v => { const s = v == null ? '' : String(v); return sep === ',' && /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; }).join(sep)).join('\n');
+}
+function copyRows(rows) {
+  if (!rows || rows.length < 2) { toast('Nothing to copy yet. Run the simulation first.'); return; }
+  const text = toDelimited(rows, '\t');
+  const fallback = () => {
+    const ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select(); let ok = false; try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+    ta.remove(); toast(ok ? 'Copied. Paste into Excel or Google Sheets.' : 'The browser blocked copying. Try Download CSV.');
+  };
+  if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(text).then(() => toast('Copied. Paste into Excel or Google Sheets.'), fallback);
+  else fallback();
+}
+function downloadRows(name, rows) {
+  if (!rows || rows.length < 2) { toast('No data yet. Run the simulation first.'); return; }
+  try {
+    const blob = new Blob(['\ufeff' + toDelimited(rows, ',')], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = name;
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 4000);
+    toast('Saved ' + name);
+  } catch (e) { copyRows(rows); }
+}
+
+/* ---------- sound (short, quiet, rate-limited) ---------- */
+const Sound = {
+  ctx: null, last: {},
+  P: { snap: ['square', 260, 120, .028, .06], tag: ['triangle', 920, 1380, .032, .06], birth: ['sine', 540, 820, .018, .07], death: ['sine', 190, 80, .024, .1], ok: ['sine', 660, 990, .05, .22], alert: ['triangle', 330, 200, .045, .3], click: ['sine', 720, 720, .02, .03] },
+  gap: { birth: 150, death: 240, tag: 70, snap: 70, click: 40 },
+  play(type) {
+    if (!G.sound) return;
+    const now = performance.now(); if (now - (this.last[type] || 0) < (this.gap[type] || 100)) return; this.last[type] = now;
+    try {
+      if (!this.ctx) { const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return; this.ctx = new AC(); }
+      const c = this.ctx; if (c.state === 'suspended') c.resume();
+      const [wave, f0, f1, vol, dur] = this.P[type]; const t = c.currentTime, o = c.createOscillator(), gn = c.createGain();
+      o.type = wave; o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(Math.max(20, f1), t + dur);
+      gn.gain.setValueAtTime(vol, t); gn.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      o.connect(gn); gn.connect(c.destination); o.start(t); o.stop(t + dur + 0.02);
+    } catch (e) { /* audio is optional */ }
+  }
+};
+
+/* ---------- crisp canvas that tracks its CSS size ---------- */
+function makeStage(canvas, onResize) {
+  const st = { canvas, ctx: canvas.getContext('2d'), w: 0, h: 0, dpr: 1 };
+  st.fit = () => {
+    const r = canvas.getBoundingClientRect(); const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const w = Math.round(r.width), h = Math.round(r.height);
+    if (w < 2 || h < 2) return false;
+    if (w === st.w && h === st.h && dpr === st.dpr) return false;
+    const ow = st.w, oh = st.h; st.w = w; st.h = h; st.dpr = dpr;
+    canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr); st.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    if (onResize) onResize(ow, oh);
+    return true;
+  };
+  if ('ResizeObserver' in window) new ResizeObserver(() => st.fit()).observe(canvas); else window.addEventListener('resize', st.fit);
+  st.fit();
+  return st;
+}
+
+/* ---------- lightweight chart renderer (no libraries, works offline) ---------- */
+function niceTicks(a, b, n) {
+  const span = b - a || 1; const raw = span / Math.max(1, n); const mag = Math.pow(10, Math.floor(Math.log10(raw))); const f = raw / mag;
+  const step = (f < 1.5 ? 1 : f < 3 ? 2 : f < 7 ? 5 : 10) * mag; const out = [];
+  for (let v = Math.ceil(a / step - 1e-9) * step; v <= b + step * 1e-6; v += step) out.push(+v.toFixed(10));
+  return out;
+}
+function logTicks(a, b) { const out = []; for (let e = Math.floor(Math.log10(a)); e <= Math.ceil(Math.log10(b)); e++) { const v = Math.pow(10, e); if (v >= a * 0.999 && v <= b * 1.001) out.push(v); } return out; }
+
+class Plot {
+  constructor(canvas) { this.cfg = null; this.st = makeStage(canvas, () => this.redraw()); }
+  redraw() { if (this.cfg) this.draw(this.cfg); }
+  draw(cfg) {
+    this.cfg = cfg; const { ctx: g, w, h } = this.st; if (w < 40 || h < 40) return;
+    g.clearRect(0, 0, w, h);
+    const legend = (cfg.series || []).filter(s => s.label);
+    if (cfg.bars && cfg.bars.label) legend.unshift({ label: cfg.bars.label, color: cfg.bars.color, box: true });
+    const hasY2 = !!cfg.y2;
+    const P = { l: 46, r: hasY2 ? 44 : 12, t: legend.length ? 24 : 10, b: 34 };
+    const L = P.l, R = w - P.r, T = P.t, B = h - P.b;
+    if (R - L < 30 || B - T < 30) return;
+    const xmin = cfg.xmin, xmax = cfg.xmax > cfg.xmin ? cfg.xmax : cfg.xmin + 1;
+    const log = !!cfg.log; let ymin = cfg.ymin, ymax = cfg.ymax;
+    if (log) { ymin = Math.max(ymin, 1); if (ymax <= ymin * 1.01) ymax = ymin * 10; } else if (!(ymax > ymin)) ymax = ymin + 1;
+    const X = x => L + (x - xmin) / (xmax - xmin) * (R - L);
+    const lmin = Math.log10(ymin), lmax = Math.log10(ymax);
+    const Y = log ? (y => B - (Math.log10(Math.max(y, ymin * 0.3)) - lmin) / (lmax - lmin) * (B - T)) : (y => B - (y - ymin) / (ymax - ymin) * (B - T));
+    const Y2 = hasY2 ? (y => B - (y - cfg.y2.min) / (cfg.y2.max - cfg.y2.min) * (B - T)) : null;
+    const font = (s, wgt = 500) => `${wgt} ${s}px ${TH.font}`;
+
+    /* grid + tick labels */
+    g.lineWidth = 1; g.font = font(11); g.fillStyle = TH.muted; g.textAlign = 'right'; g.textBaseline = 'middle';
+    const yt = log ? logTicks(ymin, ymax) : niceTicks(ymin, ymax, Math.max(3, Math.floor((B - T) / 42)));
+    yt.forEach(v => { const y = Math.round(Y(v)) + .5; g.strokeStyle = TH.grid; g.beginPath(); g.moveTo(L, y); g.lineTo(R, y); g.stroke(); g.fillText(tickLabel(v), L - 7, y); });
+    const xt = niceTicks(xmin, xmax, Math.max(3, Math.floor((R - L) / 70)));
+    g.textAlign = 'center'; g.textBaseline = 'top';
+    xt.forEach(v => { const x = Math.round(X(v)) + .5; g.strokeStyle = TH.grid; g.beginPath(); g.moveTo(x, T); g.lineTo(x, B); g.stroke(); g.fillText(tickLabel(v), x, B + 6); });
+    if (hasY2) { g.textAlign = 'left'; g.textBaseline = 'middle'; niceTicks(cfg.y2.min, cfg.y2.max, 4).forEach(v => g.fillText(tickLabel(v) + (cfg.y2.suffix || ''), R + 6, Y2(v))); }
+    /* axes and titles */
+    g.strokeStyle = TH.line; g.lineWidth = 1.3; g.beginPath(); g.moveTo(L, T); g.lineTo(L, B); g.lineTo(R, B); g.stroke();
+    g.fillStyle = TH.muted; g.font = font(12, 600); g.textAlign = 'center'; g.textBaseline = 'bottom';
+    g.fillText(cfg.xlabel || '', (L + R) / 2, h - 2);
+    g.save(); g.translate(12, (T + B) / 2); g.rotate(-Math.PI / 2); g.textBaseline = 'middle'; g.fillText(cfg.ylabel || '', 0, 0); g.restore();
+    if (hasY2 && cfg.y2.label) { g.save(); g.translate(w - 9, (T + B) / 2); g.rotate(Math.PI / 2); g.textBaseline = 'middle'; g.fillText(cfg.y2.label, 0, 0); g.restore(); }
+
+    g.save(); g.beginPath(); g.rect(L, T - 3, R - L + 3, B - T + 3); g.clip();
+    if (cfg.bars) {
+      const b = cfg.bars; g.fillStyle = b.color; g.globalAlpha = b.alpha == null ? .8 : b.alpha;
+      b.data.forEach(([x0, x1, v]) => { if (!v) return; const xa = X(x0) + 1, xb = X(x1) - 1, y = Y(v); g.fillRect(xa, y, Math.max(1, xb - xa), B - y); });
+      g.globalAlpha = 1;
+    }
+    (cfg.hlines || []).forEach(v => {
+      const y = (v.axis === 'y2' ? Y2 : Y)(v.y); g.strokeStyle = v.color || TH.muted; g.lineWidth = v.width || 1.3; g.setLineDash(v.dash || [5, 4]);
+      g.beginPath(); g.moveTo(L, y); g.lineTo(R, y); g.stroke(); g.setLineDash([]);
+      if (v.label) { g.fillStyle = v.color || TH.muted; g.font = font(11.5, 600); g.textAlign = 'right'; g.textBaseline = 'bottom'; g.fillText(v.label, R - 5, y - 3); }
+    });
+    (cfg.vlines || []).forEach(v => {
+      const x = X(v.x); g.strokeStyle = v.color || TH.muted; g.lineWidth = v.width || 1.3; g.setLineDash(v.dash || [4, 4]);
+      g.beginPath(); g.moveTo(x, T); g.lineTo(x, B); g.stroke(); g.setLineDash([]);
+      if (v.label) { const right = x > L + (R - L) * .72; g.fillStyle = v.color || TH.muted; g.font = font(11.5, 600); g.textAlign = right ? 'right' : 'left'; g.textBaseline = 'top'; g.fillText(v.label, x + (right ? -5 : 5), T + 4 + (v.row || 0) * 15); }
+    });
+    (cfg.series || []).forEach(s => {
+      const yf = s.axis === 'y2' ? Y2 : Y; const pts = s.points; if (!pts || !pts.length) return;
+      if (s.fill) {
+        g.beginPath(); g.moveTo(X(pts[0][0]), B); pts.forEach(p => g.lineTo(X(p[0]), yf(p[1]))); g.lineTo(X(pts[pts.length - 1][0]), B); g.closePath();
+        g.fillStyle = s.color; g.globalAlpha = s.fill; g.fill(); g.globalAlpha = 1;
+      }
+      if (s.scatter) { g.fillStyle = s.color; g.globalAlpha = s.alpha == null ? .7 : s.alpha; pts.forEach(p => { g.beginPath(); g.arc(X(p[0]), yf(p[1]), s.r || 2.6, 0, TAU); g.fill(); }); g.globalAlpha = 1; return; }
+      g.strokeStyle = s.color; g.lineWidth = s.width || 2; g.globalAlpha = s.alpha == null ? 1 : s.alpha; g.setLineDash(s.dash || []); g.lineJoin = 'round'; g.lineCap = 'round';
+      g.beginPath();
+      pts.forEach((p, i) => { const x = X(p[0]), y = yf(p[1]); if (i === 0) g.moveTo(x, y); else { if (s.step) g.lineTo(x, yf(pts[i - 1][1])); g.lineTo(x, y); } });
+      g.stroke(); g.setLineDash([]); g.globalAlpha = 1;
+      if (s.endLabel) { const p = pts[pts.length - 1]; g.fillStyle = s.color; g.font = font(11.5, 650); g.textAlign = 'left'; g.textBaseline = 'middle'; g.fillText(s.endLabel, Math.min(X(p[0]) + 5, R - 52), clamp(yf(p[1]), T + 8, B - 8)); }
+    });
+    (cfg.dots || []).forEach(d => {
+      const x = X(d.x), y = Y(d.y); g.fillStyle = d.color; g.strokeStyle = TH.panel; g.lineWidth = 2.5; g.beginPath(); g.arc(x, y, d.r || 6, 0, TAU); g.fill(); g.stroke();
+      if (d.label) { const right = x > (L + R) / 2; g.fillStyle = TH.ink; g.font = font(12, 650); g.textAlign = right ? 'right' : 'left'; g.textBaseline = 'bottom'; g.fillText(d.label, x + (right ? -10 : 10), y - 6); }
+    });
+    g.restore();
+    if (legend.length) {
+      let x = L; const y = 13; g.font = font(12, 600); g.textBaseline = 'middle'; g.textAlign = 'left';
+      legend.forEach(s => {
+        const tw = g.measureText(s.label).width; if (x + 22 + tw > w - 4) return;
+        g.strokeStyle = s.color; g.fillStyle = s.color; g.lineWidth = 2.6; g.globalAlpha = s.alpha ? Math.max(s.alpha, .7) : 1; g.setLineDash(s.dash || []);
+        if (s.box) g.fillRect(x, y - 5, 14, 10); else if (s.scatter) { g.beginPath(); g.arc(x + 7, y, 4, 0, TAU); g.fill(); } else { g.beginPath(); g.moveTo(x, y); g.lineTo(x + 16, y); g.stroke(); }
+        g.setLineDash([]); g.globalAlpha = 1; g.fillStyle = TH.muted; g.fillText(s.label, x + 21, y); x += 21 + tw + 16;
+      });
+    }
+    if (cfg.empty) { g.fillStyle = TH.muted; g.font = font(13.5, 500); g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(cfg.empty, (L + R) / 2, (T + B) / 2); }
+  }
+}
+
+/* ---------- drawing primitives ---------- */
+function ell(g, x, y, rx, ry, rot = 0) { g.beginPath(); g.ellipse(x, y, Math.max(.1, rx), Math.max(.1, ry), rot, 0, TAU); g.fill(); }
+function circ(g, x, y, r) { g.beginPath(); g.arc(x, y, Math.max(.1, r), 0, TAU); g.fill(); }
+function rrect(g, x, y, w, h, r) {
+  g.beginPath();
+  if (g.roundRect) { g.roundRect(x, y, w, h, r); return; }
+  g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath();
+}
+
+/* ---------- terrain: top-down meadow painted once per size ---------- */
+const PAL = {
+  meadow: { base: ['#6C973D', '#527C31'], blotch: [[150, 184, 84, .36], [82, 120, 46, .36], [184, 176, 92, .2], [60, 96, 38, .3], [118, 158, 68, .3]], tuftD: '#365821', tuftL: '#B3D077', flowers: ['#F6F3E8', '#F2CF45', '#BBA2DC', '#FFFFFF'] },
+  desert: { base: ['#CDB582', '#B59A64'], blotch: [[218, 198, 150, .4], [168, 138, 94, .3], [146, 156, 88, .2]], tuftD: '#7F7244', tuftL: '#E7D6A6', flowers: ['#EADBB2', '#D98C5F'] },
+  rainforest: { base: ['#3C6832', '#2A4F27'], blotch: [[68, 120, 58, .34], [28, 68, 34, .36], [104, 140, 66, .2]], tuftD: '#183617', tuftL: '#7DB062', flowers: ['#EFE6F4', '#F08AA8', '#F6D35B'] }
+};
+function paintTerrain(w, h, dpr, opt = {}) {
+  const c = document.createElement('canvas'); c.width = Math.max(1, Math.round(w * dpr)); c.height = Math.max(1, Math.round(h * dpr));
+  const g = c.getContext('2d'); g.scale(dpr, dpr);
+  const R = mulberry32(opt.seed || 11); const p = PAL[opt.pal || 'meadow'];
+  if (!opt.overlay) {
+    const lg = g.createLinearGradient(0, 0, w, h); lg.addColorStop(0, p.base[0]); lg.addColorStop(1, p.base[1]); g.fillStyle = lg; g.fillRect(0, 0, w, h);
+    const nb = Math.round(w * h / 7000) + 24;
+    for (let i = 0; i < nb; i++) {
+      const x = R() * w, y = R() * h, rad = 18 + R() * 85; const [r, gg, b, a] = p.blotch[(R() * p.blotch.length) | 0];
+      const rg = g.createRadialGradient(x, y, 0, x, y, rad); rg.addColorStop(0, `rgba(${r},${gg},${b},${a})`); rg.addColorStop(1, `rgba(${r},${gg},${b},0)`);
+      g.fillStyle = rg; g.fillRect(x - rad, y - rad, rad * 2, rad * 2);
+    }
+  }
+  /* grass texture: loose blades and small clumps seen from above */
+  const nt = Math.round(w * h / (opt.density || 110));
+  [p.tuftD, p.tuftL].forEach((col, k) => {
+    g.strokeStyle = col; g.lineWidth = 1; g.globalAlpha = (k ? .42 : .5) * (opt.overlay ? .8 : 1); g.beginPath();
+    for (let i = 0; i < nt / 2; i++) { const x = R() * w, y = R() * h, len = 2.5 + R() * 5, an = R() * TAU; g.moveTo(x, y); g.lineTo(x + Math.cos(an) * len, y + Math.sin(an) * len); }
+    g.stroke();
+  });
+  g.strokeStyle = p.tuftD; g.globalAlpha = .45; g.beginPath();
+  for (let i = 0; i < w * h / 1600; i++) { const x = R() * w, y = R() * h; for (let k = 0; k < 6; k++) { const an = k / 6 * TAU + R() * .5, len = 3 + R() * 4; g.moveTo(x, y); g.lineTo(x + Math.cos(an) * len, y + Math.sin(an) * len); } }
+  g.stroke(); g.globalAlpha = 1;
+  /* wildflowers */
+  const nf = Math.round(w * h / (opt.flowers || 3200));
+  for (let i = 0; i < nf; i++) { g.fillStyle = p.flowers[(R() * p.flowers.length) | 0]; g.globalAlpha = .8; circ(g, R() * w, R() * h, 1 + R() * 1.1); }
+  g.globalAlpha = 1;
+  if (opt.overlay) return { canvas: c, w, h, dpr, pond: null };
+  /* rocks */
+  for (let i = 0; i < (opt.rocks == null ? 5 : opt.rocks); i++) {
+    const x = R() * w, y = R() * h, r = 4 + R() * 7, rot = R() * 3;
+    g.fillStyle = 'rgba(0,0,0,.25)'; ell(g, x + 2, y + 2.5, r * 1.2, r * .85, rot);
+    g.fillStyle = '#8F9088'; ell(g, x, y, r * 1.2, r * .85, rot);
+    g.fillStyle = 'rgba(255,255,255,.22)'; ell(g, x - r * .3, y - r * .3, r * .55, r * .35, rot);
+  }
+  /* pond */
+  let pond = null;
+  if (opt.pond) {
+    const s = Math.min(w, h); pond = { x: w * opt.pond[0], y: h * opt.pond[1], rx: s * opt.pond[2], ry: s * opt.pond[2] * .68 };
+    g.fillStyle = 'rgba(96,78,52,.75)'; ell(g, pond.x, pond.y, pond.rx + 6, pond.ry + 5);
+    const wg = g.createRadialGradient(pond.x - pond.rx * .2, pond.y - pond.ry * .3, 2, pond.x, pond.y, pond.rx);
+    wg.addColorStop(0, '#5E9DA9'); wg.addColorStop(1, '#2B5E6A'); g.fillStyle = wg; ell(g, pond.x, pond.y, pond.rx, pond.ry);
+    g.strokeStyle = 'rgba(255,255,255,.16)'; g.lineWidth = 1;
+    for (let k = 1; k <= 3; k++) { g.beginPath(); g.ellipse(pond.x + pond.rx * .15, pond.y - pond.ry * .1, pond.rx * .22 * k, pond.ry * .2 * k, 0, 0, TAU); g.stroke(); }
+    for (let k = 0; k < 4; k++) { const a = R() * TAU, d = R() * .6; const lx = pond.x + Math.cos(a) * pond.rx * d, ly = pond.y + Math.sin(a) * pond.ry * d; g.fillStyle = '#4C7F3A'; g.beginPath(); g.moveTo(lx, ly); g.arc(lx, ly, 5 + R() * 3, .4, TAU - .1); g.closePath(); g.fill(); }
+    g.strokeStyle = '#2F4C1E'; g.lineWidth = 1.2; g.beginPath();
+    for (let k = 0; k < 46; k++) { const a = R() * TAU; const ex = pond.x + Math.cos(a) * (pond.rx + 3), ey = pond.y + Math.sin(a) * (pond.ry + 3); g.moveTo(ex, ey); g.lineTo(ex + Math.cos(a) * (4 + R() * 6), ey + Math.sin(a) * (4 + R() * 6)); }
+    g.stroke();
+  }
+  return { canvas: c, w, h, dpr, pond };
+}
+
+/* ---------- hopping: move only while airborne, then land with a squish ---------- */
+const HOP_AIR = .42;
+function hopMul(a, dt, speed) {
+  if (a.hT == null) { a.hT = rand(.42, .6); a.hu = Math.random(); }
+  if (speed < 9) { if (a.hu < HOP_AIR) { a.hu += dt / a.hT; return 1 / HOP_AIR; } a.hu = .99; return 1; }
+  a.hu = (a.hu + dt / (a.hT * clamp(28 / speed, .5, 1.3))) % 1;
+  return a.hu < HOP_AIR ? 1 / HOP_AIR : 0;
+}
+function hopPose(u) {
+  if (u == null) return { lift: 0, sq: 0 };
+  if (u < HOP_AIR) { const k = Math.sin(Math.PI * u / HOP_AIR); return { lift: k, sq: -.09 * k }; }
+  const g2 = (u - HOP_AIR) / (1 - HOP_AIR); return { lift: 0, sq: g2 < .28 ? (1 - g2 / .28) * .17 : 0 };
+}
+
+/* ---------- movement helpers ---------- */
+function wrapAng(a) { while (a > Math.PI) a -= TAU; while (a < -Math.PI) a += TAU; return a; }
+function steer(a, target, maxTurn) { return a + clamp(wrapAng(target - a), -maxTurn, maxTurn); }
+function inPond(p, pd, pad = 0) { if (!pd) return false; const dx = (p.x - pd.x) / (pd.rx + pad), dy = (p.y - pd.y) / (pd.ry + pad); return dx * dx + dy * dy < 1; }
+function randIn(box, m = 0, pond = null) {
+  for (let k = 0; k < 30; k++) { const p = { x: rand(box.x + m, box.x + box.w - m), y: rand(box.y + m, box.y + box.h - m) }; if (!inPond(p, pond, 12)) return p; }
+  return { x: box.x + m + 4, y: box.y + m + 4 };
+}
+function keepIn(a, box, m = 6) {
+  if (a.x < box.x + m) { a.x = box.x + m; a.a = Math.PI - a.a; } else if (a.x > box.x + box.w - m) { a.x = box.x + box.w - m; a.a = Math.PI - a.a; }
+  if (a.y < box.y + m) { a.y = box.y + m; a.a = -a.a; } else if (a.y > box.y + box.h - m) { a.y = box.y + box.h - m; a.a = -a.a; }
+}
+function avoidPond(a, pd) {
+  if (!pd) return; const pad = 7; const dx = (a.x - pd.x) / (pd.rx + pad), dy = (a.y - pd.y) / (pd.ry + pad); const d2 = dx * dx + dy * dy;
+  if (d2 < 1) { const k = 1 / Math.sqrt(d2 || 1e-6); a.x = pd.x + dx * k * (pd.rx + pad); a.y = pd.y + dy * k * (pd.ry + pad); a.a = Math.atan2(dy, dx) + rand(-.7, .7); }
+}
+function wander(a, dt, box, speed, pond, turn = 1.9) {
+  a.a += gauss() * turn * Math.sqrt(Math.max(dt, 0)); const s = speed * dt * hopMul(a, dt, speed);
+  a.x += Math.cos(a.a) * s; a.y += Math.sin(a.a) * s; a.ph += dt * (4 + speed * .16);
+  keepIn(a, box); avoidPond(a, pond);
+}
+function follow(a, dt, speed) {
+  const p = a.path[0]; const dx = p.x - a.x, dy = p.y - a.y, d = Math.hypot(dx, dy), s = speed * dt * hopMul(a, dt, speed);
+  if (d > .01) a.a = Math.atan2(dy, dx); a.ph += dt * 16;
+  if (d <= s) { a.x = p.x; a.y = p.y; a.path.shift(); if (p.cb) p.cb(a); } else { a.x += dx / d * s; a.y += dy / d * s; }
+}
+
+/* ---------- bio-blobs: cute round organisms ---------- */
+const TAG_COLOR = '#FFC23A';
+const BLOB_PAL = {
+  mint: ['#C9F7DF', '#5ED6A0', '#1F9C69'], cyan: ['#D3F0FF', '#4FC0F0', '#1F82BC'],
+  gold: ['#FFF3B8', '#FFCB45', '#D99316'], sick: ['#F1E2FF', '#C08CF0', '#7B3FBF'],
+  hunter: ['#FFD9B8', '#FF8A3D', '#C8521A']
+};
+function drawBlob(g, x, y, r, o = {}) {
+  const pal = BLOB_PAL[o.pal || 'cyan'], ph = o.ph || 0, pose = hopPose(o.hu), sq = pose.sq + Math.sin(ph * 1.3) * .025, lift = pose.lift * r * .95;
+  const look = o.a == null ? 0 : o.a, lx = Math.cos(look) * r * .1, ly = Math.sin(look) * r * .08;
+  if (o.ring) {
+    g.lineWidth = 3.5; g.strokeStyle = 'rgba(255,255,255,.92)'; g.beginPath(); g.arc(x, y, r * 1.75, 0, TAU); g.stroke();
+    g.lineWidth = 2.2; g.strokeStyle = o.ring; g.beginPath(); g.arc(x, y, r * 1.75, 0, TAU); g.stroke();
+  }
+  g.save(); g.translate(x, y); if (o.alpha != null) g.globalAlpha = o.alpha;
+  g.fillStyle = `rgba(15,30,15,${.3 - pose.lift * .12})`; ell(g, 0, r * .92, r * .95 * (1 - pose.lift * .25), r * .3 * (1 - pose.lift * .25));
+  g.translate(0, -lift + r * sq * .9); g.scale(1 + sq, 1 - sq);
+  if (o.ears) { g.fillStyle = pal[2]; for (const s of [-1, 1]) { g.beginPath(); g.moveTo(s * r * .3, -r * .7); g.lineTo(s * r * .78, -r * 1.35); g.lineTo(s * r * .82, -r * .45); g.closePath(); g.fill(); } }
+  const gr = g.createRadialGradient(-r * .3, -r * .35, r * .1, 0, 0, r);
+  gr.addColorStop(0, pal[0]); gr.addColorStop(.6, pal[1]); gr.addColorStop(1, pal[2]);
+  g.fillStyle = gr; circ(g, 0, 0, r);
+  g.strokeStyle = 'rgba(255,255,255,.7)'; g.lineWidth = 1.2; g.beginPath(); g.arc(0, 0, r, 0, TAU); g.stroke();
+  g.fillStyle = 'rgba(255,255,255,.6)'; ell(g, -r * .35, -r * .42, r * .36, r * .19, -.7);
+  g.fillStyle = 'rgba(255,110,140,.45)'; circ(g, -r * .55 + lx, r * .2 + ly, r * .17); circ(g, r * .55 + lx, r * .2 + ly, r * .17);
+  const blink = (ph % 5.3) < .14, ex = r * .32, ey = -r * .05, er = r * .2;
+  g.fillStyle = '#16233A'; g.strokeStyle = '#16233A'; g.lineWidth = Math.max(1, r * .12); g.lineCap = 'round';
+  for (const s of [-1, 1]) {
+    const cx = s * ex + lx, cy = ey + ly;
+    if (blink) { g.beginPath(); g.moveTo(cx - er, cy); g.lineTo(cx + er, cy); g.stroke(); }
+    else { circ(g, cx, cy, er); g.fillStyle = '#fff'; circ(g, cx - er * .35, cy - er * .35, er * .42); g.fillStyle = '#16233A'; }
+  }
+  if (o.hunter) { g.strokeStyle = '#7A2E0C'; g.lineWidth = Math.max(1, r * .1); for (const s of [-1, 1]) { g.beginPath(); g.moveTo(s * r * .5 + lx, -r * .42 + ly); g.lineTo(s * r * .16 + lx, -r * .3 + ly); g.stroke(); } }
+  g.strokeStyle = '#16233A'; g.lineWidth = Math.max(1, r * .1); g.beginPath(); g.arc(lx, r * .2 + ly, r * .16, .15 * Math.PI, .85 * Math.PI); g.stroke();
+  if (o.marked) { g.fillStyle = TAG_COLOR; g.strokeStyle = '#E2463A'; g.lineWidth = 1.6; g.beginPath(); g.arc(0, -r - 2, Math.max(3, r * .36), 0, TAU); g.fill(); g.stroke(); g.fillStyle = '#E2463A'; circ(g, 0, -r - 2, Math.max(1.2, r * .13)); }
+  g.restore();
+}
+function drawVole(g, x, y, a, s, o = {}) { drawBlob(g, x, y, s * 1.1, { ...o, a, pal: o.marked ? 'gold' : 'cyan' }); }
+function drawRabbit(g, x, y, a, s, o = {}) { drawBlob(g, x, y, s * 1.05, { ...o, a, pal: o.sick ? 'sick' : 'mint' }); }
+function drawFoxReal(g, x, y, a, s, o = {}) {
+  g.save(); g.translate(x, y); g.rotate(a);
+  g.fillStyle = 'rgba(18,28,12,.32)'; ell(g, 2, 2.5, s * 1.9, s * .75);
+  const sw = Math.sin(o.ph || 0) * .25;
+  g.save(); g.translate(-s * .95, 0); g.rotate(sw); g.fillStyle = '#BE5A25'; ell(g, -s * .66, 0, s * .76, s * .31); g.fillStyle = '#F2ECE2'; ell(g, -s * 1.32, 0, s * .26, s * .21); g.restore();
+  g.fillStyle = '#C9652B'; ell(g, 0, 0, s * 1.1, s * .56);
+  g.fillStyle = 'rgba(92,40,14,.33)'; ell(g, -s * .12, 0, s * .8, s * .22);
+  g.fillStyle = '#CF6C30'; ell(g, s * 1.0, 0, s * .46, s * .41);
+  g.fillStyle = '#F1E6D8'; ell(g, s * 1.42, 0, s * .27, s * .18);
+  g.fillStyle = '#18110D'; circ(g, s * 1.67, 0, s * .085);
+  g.fillStyle = '#2B1A12';
+  g.beginPath(); g.moveTo(s * .86, -s * .24); g.lineTo(s * .6, -s * .58); g.lineTo(s * 1.02, -s * .38); g.closePath(); g.fill();
+  g.beginPath(); g.moveTo(s * .86, s * .24); g.lineTo(s * .6, s * .58); g.lineTo(s * 1.02, s * .38); g.closePath(); g.fill();
+  g.fillStyle = '#100A07'; circ(g, s * 1.2, -s * .19, s * .065); circ(g, s * 1.2, s * .19, s * .065);
+  g.restore();
+}
+function drawFox(g, x, y, a, s, o = {}) {
+  const run = clamp((o.spd || 0) / 50, 0, 1.3), ph = o.ph || 0;
+  if (run > .05) {
+    g.save(); g.translate(x, y); g.rotate(a); g.fillStyle = '#3A2418';
+    for (const [lx, side, off] of [[.55, -1, 0], [.55, 1, .9], [-.6, -1, Math.PI], [-.6, 1, Math.PI + .9]]) {
+      const swing = Math.sin(ph + off) * s * .32 * run; ell(g, s * lx + swing, side * s * .5, s * .22, s * .11);
+    }
+    g.restore();
+  }
+  const k = 1 + Math.sin(ph * 2) * .05 * run;
+  g.save(); g.translate(x, y); g.rotate(a); g.scale(k, 1 / k); g.rotate(-a); g.translate(-x, -y);
+  drawFoxReal(g, x, y, a, s, o); g.restore();
+}
+/* birth "ping" and death marker drawn on habitats */
+function drawPings(g, list, dt) {
+  for (let i = list.length - 1; i >= 0; i--) {
+    const p = list[i]; p.t -= dt; if (p.t <= 0) { list.splice(i, 1); continue; }
+    const k = 1 - p.t / p.T;
+    if (p.kind === 'birth') { g.strokeStyle = `rgba(185,242,124,${(1 - k) * .95})`; g.lineWidth = 2; g.beginPath(); g.arc(p.x, p.y, 5 + k * 13, 0, TAU); g.stroke(); }
+    else {
+      g.strokeStyle = `rgba(236,230,216,${(1 - k) * .9})`; g.lineWidth = 1.8; const r = 4 + k * 3;
+      g.beginPath(); g.moveTo(p.x - r, p.y - r); g.lineTo(p.x + r, p.y + r); g.moveTo(p.x + r, p.y - r); g.lineTo(p.x - r, p.y + r); g.stroke();
+      g.beginPath(); g.arc(p.x, p.y, 7 + k * 5, 0, TAU); g.stroke();
+    }
+  }
+}
+
+/* =====================================================================
+   OPTION 1 — MARK–RECAPTURE (Lincoln–Petersen, N = s·n / x)
+   ===================================================================== */
+const MR = { st: null, bg: null, plot: null, ready: false, voles: [], traps: [], pen: null, field: null,
+  phase: 'ready', s: 0, n: 0, x: 0, est: null, mixT: 0, MIX: 2.4, log: [], batch: null, auto: false, autoT: 0, hidden: false };
+const VOLE_SIZE = 6.8;
+
+function mrLayout() {
+  const { w, h } = MR.st; const pw = clamp(Math.round(w * .24), 118, 230);
+  MR.pen = { x: w - pw - 10, y: 10, w: pw, h: h - 20 };
+  MR.field = { x: 10, y: 10, w: MR.pen.x - 22, h: h - 20 };
+  const f = MR.field, cols = Math.max(3, Math.round(f.w / 140)), rows = Math.max(2, Math.round(f.h / 112)), R = mulberry32(5);
+  MR.traps = [];
+  for (let i = 0; i < cols; i++) for (let j = 0; j < rows; j++) {
+    MR.traps.push({ x: f.x + (i + .5) * f.w / cols + (R() - .5) * 34, y: f.y + (j + .5) * f.h / rows + (R() - .5) * 28, a: (R() - .5) * 1.4, shut: 0 });
+  }
+}
+const penInner = () => ({ x: MR.pen.x + 14, y: MR.pen.y + 46, w: MR.pen.w - 28, h: MR.pen.h - 60 });
+const penVoles = () => MR.voles.filter(v => v.where === 'pen');
+const trapW = () => Math.exp(1.2 * val('mr-trap'));
+const mrMoving = () => MR.voles.some(v => v.where === 'moving');
+
+function mrBuildBg() {
+  const { w, h, dpr } = MR.st;
+  MR.bg = paintTerrain(w, h, dpr, { seed: 3, pal: 'meadow', rocks: 4 });
+  const g = MR.bg.canvas.getContext('2d'); const p = MR.pen; const R = mulberry32(9);
+  g.fillStyle = 'rgba(0,0,0,.3)'; rrect(g, p.x + 3, p.y + 5, p.w, p.h, 12); g.fill();
+  const wg = g.createLinearGradient(p.x, 0, p.x + p.w, 0); wg.addColorStop(0, '#9C7348'); wg.addColorStop(1, '#7F5D39');
+  g.fillStyle = wg; rrect(g, p.x, p.y, p.w, p.h, 12); g.fill();
+  g.strokeStyle = 'rgba(60,38,18,.35)'; g.lineWidth = 1;
+  for (let yy = p.y + 8; yy < p.y + p.h; yy += 15) { g.beginPath(); g.moveTo(p.x + 3, yy); g.lineTo(p.x + 9, yy); g.moveTo(p.x + p.w - 9, yy); g.lineTo(p.x + p.w - 3, yy); g.stroke(); }
+  const ix = p.x + 9, iy = p.y + 36, iw = p.w - 18, ih = p.h - 45;
+  g.fillStyle = '#D6BC82'; rrect(g, ix, iy, iw, ih, 8); g.fill();
+  const cols = ['#C6A55F', '#E7D29B', '#B48F4B', '#DCC384'];
+  for (let k = 0; k < 4; k++) {
+    g.strokeStyle = cols[k]; g.globalAlpha = .75; g.lineWidth = 1; g.beginPath();
+    for (let i = 0; i < iw * ih / 55; i++) { const x = ix + 3 + R() * (iw - 6), y = iy + 3 + R() * (ih - 6), an = R() * TAU, l = 3 + R() * 6; g.moveTo(x, y); g.lineTo(x + Math.cos(an) * l, y + Math.sin(an) * l); }
+    g.stroke();
+  }
+  g.globalAlpha = 1;
+  g.fillStyle = '#FBF3E2'; g.font = `700 13px ${TH.font}`; g.textAlign = 'left'; g.textBaseline = 'middle';
+  g.fillText('Holding pen', p.x + 12, p.y + 19);
+}
+
+function drawTrap(g, t) {
+  g.save(); g.translate(t.x, t.y); g.rotate(t.a);
+  g.fillStyle = 'rgba(0,0,0,.3)'; rrect(g, -8, -3, 20, 10, 2); g.fill();
+  const gr = g.createLinearGradient(0, -5, 0, 5); gr.addColorStop(0, '#DADFE0'); gr.addColorStop(1, '#8E979A');
+  g.fillStyle = gr; rrect(g, -10, -4.5, 13, 9, 1.5); g.fill();
+  g.fillStyle = '#6C7578'; rrect(g, 2, -5.5, 8.5, 11, 1.5); g.fill();
+  g.strokeStyle = 'rgba(25,25,25,.55)'; g.lineWidth = 1.2; g.beginPath(); g.moveTo(-10, -4.5); g.lineTo(-10, 4.5); g.stroke();
+  if (t.shut > 0) { g.fillStyle = TAG_COLOR; circ(g, -10, -6.5, 2.8); }
+  g.restore();
+}
+
+function mrNewPopulation() {
+  if (!MR.ready) return;
+  MR.phase = 'ready'; MR.s = MR.n = MR.x = 0; MR.est = null; MR.auto = false;
+  const N = val('mr-N'); MR.voles = [];
+  for (let i = 0; i < N; i++) { const p = randIn(MR.field, 10); MR.voles.push({ x: p.x, y: p.y, a: rand(0, TAU), v: rand(14, 30), ph: rand(0, TAU), marked: false, where: 'field', path: [], wait: 0, tagT: 0, ring: 0, hl: false }); }
+  mrUI();
+}
+
+/* weighted sampling without replacement: marked voles can be more or less catchable */
+function weightedSample(arr, k, wf) {
+  const pool = arr.slice(), w = pool.map(wf), out = []; let tot = w.reduce((a, b) => a + b, 0);
+  for (let i = 0; i < k && pool.length; i++) {
+    let r = Math.random() * tot, j = 0; while (j < pool.length - 1 && r >= w[j]) { r -= w[j]; j++; }
+    out.push(pool[j]); tot -= w[j]; pool.splice(j, 1); w.splice(j, 1);
+  }
+  return out;
+}
+function nearestTrap(v) { let best = MR.traps[0], bd = Infinity; for (const t of MR.traps) { const d = (t.x - v.x) ** 2 + (t.y - v.y) ** 2; if (d < bd) { bd = d; best = t; } } return best; }
+function mrCapture(k, wMarked) {
+  const pool = MR.voles.filter(v => v.where === 'field'); const pi = penInner();
+  const chosen = weightedSample(pool, Math.min(k, pool.length), v => (v.marked ? wMarked : 1));
+  chosen.forEach(v => {
+    const t = nearestTrap(v); v.where = 'moving'; v.wait = Math.random() * .7;
+    v.path = [{ x: t.x, y: t.y, cb: () => { t.shut = 1.6; Sound.play('snap'); } }, { x: rand(pi.x, pi.x + pi.w), y: rand(pi.y, pi.y + pi.h), cb: a => { a.where = 'pen'; } }];
+  });
+}
+const releasePoint = () => ({ x: MR.pen.x - 30, y: MR.pen.y + MR.pen.h / 2 });
+/* second capture: each catch goes to a random trap and takes the blob nearest to it,
+   so unmixed tagged blobs bunched near the release point really do bias the result */
+function mrCaptureNearTraps(k, wMarked) {
+  const pool = MR.voles.filter(v => v.where === 'field'), pi = penInner(), picks = [];
+  for (let i = 0; i < k && pool.length; i++) {
+    const t = MR.traps[(Math.random() * MR.traps.length) | 0]; let bi = 0, bs = Infinity;
+    for (let j = 0; j < pool.length; j++) { const v = pool[j]; const d = Math.hypot(v.x - t.x, v.y - t.y) * (v.marked ? 1 / wMarked : 1) * rand(.8, 1.25); if (d < bs) { bs = d; bi = j; } }
+    picks.push([pool.splice(bi, 1)[0], t]);
+  }
+  picks.forEach(([v, t]) => { v.where = 'moving'; v.wait = Math.random() * .7; v.path = [{ x: t.x, y: t.y, cb: () => { t.shut = 1.6; Sound.play('snap'); } }, { x: rand(pi.x, pi.x + pi.w), y: rand(pi.y, pi.y + pi.h), cb: a => { a.where = 'pen'; } }]; });
+}
+function mrReleasePen(together) {
+  const rp = releasePoint();
+  penVoles().forEach(v => { const p = together ? { x: clamp(rp.x - rand(0, 75), MR.field.x + 8, MR.field.x + MR.field.w - 8), y: clamp(rp.y + rand(-85, 85), MR.field.y + 8, MR.field.y + MR.field.h - 8) } : randIn(MR.field, 12); v.where = 'moving'; v.wait = Math.random() * .4; v.hl = false; v.path = [{ x: p.x, y: p.y, cb: a => { a.where = 'field'; } }]; });
+}
+
+function mrNext() {
+  if (!MR.ready) return;
+  const N = MR.voles.length;
+  switch (MR.phase) {
+    case 'ready':
+      if (mrMoving()) return;
+      MR.s = MR.n = MR.x = 0; MR.est = null; mrCapture(Math.min(val('mr-s'), N - 1), 1); MR.phase = 'capturing'; break;
+    case 'captured': {
+      const pv = penVoles(); const gap = Math.min(.06, 2.2 / Math.max(1, pv.length));
+      pv.forEach((v, i) => { v.tagT = .12 + i * gap; }); MR.phase = 'marking'; break;
+    }
+    case 'marked': mrReleasePen(true); MR.phase = 'mixing'; MR.mixT = 0; MR.MIX = .3 + val('mr-mix') * .7; MR.mixDays = val('mr-mix'); break;
+    case 'mixed': mrCaptureNearTraps(Math.min(val('mr-n'), N), trapW()); MR.phase = 'recapturing'; break;
+    case 'done': mrReleasePen(false); MR.voles.forEach(v => { v.marked = false; v.hl = false; }); MR.phase = 'ready'; MR.s = MR.n = MR.x = 0; MR.est = null; break;
+    default: return;
+  }
+  mrUI();
+}
+function mrFinish() {
+  const caught = penVoles(); MR.n = caught.length; MR.x = caught.filter(v => v.marked).length;
+  caught.forEach(v => { v.hl = v.marked; });
+  MR.est = MR.x > 0 ? MR.s * MR.n / MR.x : null;
+  const N = MR.voles.length;
+  MR.log.push({ trial: MR.log.length + 1, N, s: MR.s, n: MR.n, x: MR.x, est: MR.est, trap: val('mr-trap'), mix: MR.mixDays == null ? 14 : MR.mixDays });
+  MR.phase = 'done'; MR.auto = false; Sound.play(MR.x ? 'ok' : 'alert');
+  mrUI(); mrLogTable();
+}
+
+function mrTick(dt) {
+  if (!MR.ready) { if (MR.st.w < 80) return; MR.ready = true; mrLayout(); mrNewPopulation(); }
+  const pi = penInner();
+  for (const v of MR.voles) {
+    if (v.tagT > 0) { v.tagT -= dt; if (v.tagT <= 0) { v.tagT = 0; v.marked = true; v.ring = .7; Sound.play('tag'); } }
+    if (v.ring > 0) v.ring = Math.max(0, v.ring - dt);
+    if (v.wait > 0) { v.wait -= dt; v.ph += dt * 3; continue; }
+    if (v.path.length) follow(v, dt, 230);
+    else if (v.where === 'pen') wander(v, dt, pi, 6);
+    else if (MR.phase === 'mixing') wander(v, dt, MR.field, v.v * 2.4, null, .55);
+    else wander(v, dt, MR.field, v.v);
+  }
+  MR.traps.forEach(t => { if (t.shut > 0) t.shut -= dt; });
+  const moving = mrMoving();
+  if (MR.phase === 'capturing' && !moving) { MR.s = penVoles().length; MR.phase = 'captured'; mrUI(); }
+  else if (MR.phase === 'marking' && !MR.voles.some(v => v.tagT > 0)) { MR.phase = 'marked'; mrUI(); }
+  else if (MR.phase === 'mixing') { MR.mixT += dt; $('#mr-bar').style.width = Math.min(100, MR.mixT / MR.MIX * 100) + '%'; if (MR.mixT >= MR.MIX && !moving) { MR.phase = 'mixed'; mrUI(); } }
+  else if (MR.phase === 'recapturing' && !moving) mrFinish();
+  if (MR.auto) {
+    const idle = ['ready', 'captured', 'marked', 'mixed'].includes(MR.phase) && !moving;
+    if (idle) { MR.autoT += dt / G.speed; if (MR.autoT > .6) { MR.autoT = 0; mrNext(); } } else MR.autoT = 0;
+  }
+}
+
+function mrRender() {
+  const { ctx: g, w, h } = MR.st; if (!MR.ready || w < 80) return;
+  if (!MR.bg || MR.bg.w !== w || MR.bg.h !== h || MR.bg.dpr !== MR.st.dpr) mrBuildBg();
+  g.drawImage(MR.bg.canvas, 0, 0, w, h);
+  MR.traps.forEach(t => drawTrap(g, t));
+  const inPen = penVoles().length;
+  g.fillStyle = '#FBF3E2'; g.font = `600 12.5px ${TH.font}`; g.textAlign = 'right'; g.textBaseline = 'middle';
+  g.fillText(`${inPen} blob${inPen === 1 ? '' : 's'}`, MR.pen.x + MR.pen.w - 12, MR.pen.y + 19);
+  for (const v of MR.voles) {
+    const ring = v.hl ? '#FF4F3C' : v.ring > 0 ? `rgba(255,170,90,${v.ring / .7})` : null;
+    drawVole(g, v.x, v.y, v.a, VOLE_SIZE, { marked: v.marked, ph: v.ph, ring, hu: v.hu });
+  }
+}
+
+/* ---------- formula + readouts ---------- */
+const q = (v, c) => `<b class="${c}">${v == null ? '?' : fmt(v)}</b>`;
+function mrUI() {
+  if (!MR.ready) return;
+  const ph = MR.phase, moving = mrMoving(), N = MR.voles.length;
+  const idx = { ready: 0, capturing: 0, captured: 1, marking: 1, marked: 2, mixing: 2, mixed: 3, recapturing: 3, done: 4 }[ph];
+  $$('#mr-steps li').forEach((li, i) => { li.classList.toggle('now', i === idx); li.classList.toggle('done', i < idx); });
+  const s = Math.min(val('mr-s'), N - 1), n = Math.min(val('mr-n'), N);
+  const label = { ready: `Step 1: Catch ${s} blobs`, capturing: 'Catching…', captured: `Step 2: Tag the ${MR.s} blobs`, marking: 'Tagging…', marked: 'Step 3: Release them', mixing: 'Mixing…', mixed: `Step 4: Catch ${n} blobs again`, recapturing: 'Checking the traps…', done: 'Start a new trial' }[ph];
+  const btn = $('#mr-next'); const busy = ['capturing', 'marking', 'mixing', 'recapturing'].includes(ph) || (ph === 'ready' && moving);
+  const txt = ph === 'ready' && moving ? 'Releasing…' : label; if (btn.textContent !== txt) btn.textContent = txt; btn.disabled = busy;
+  const autoTxt = MR.auto ? 'Stop auto-play' : 'Auto-play trial'; if ($('#mr-auto').textContent !== autoTxt) $('#mr-auto').textContent = autoTxt;
+  const pct = MR.n ? Math.round(MR.x / MR.n * 100) : 0;
+  const hint = {
+    ready: 'Traps are set across the meadow. The blobs you catch first are your sample s.',
+    capturing: 'Blobs are wandering into the traps…',
+    captured: `${MR.s} blobs are in the holding pen. Give each one an tag so you can recognise it later.`,
+    marking: 'Fitting tags…',
+    marked: 'Every blob in the pen is tagged. Release them so they mix back into the population.',
+    mixing: 'Waiting for tagged blobs to spread out among the untagged ones…',
+    mixed: 'Tagged blobs are now mixed in. Set the traps again for the second sample, n.',
+    recapturing: 'Checking the traps and counting tags…',
+    done: MR.x > 0 ? `${MR.x} of the ${MR.n} blobs caught already had tags, so about ${pct}% of the meadow is tagged.` : 'No tagged blobs were caught again, so x = 0 and the formula cannot be used. Try bigger samples.'
+  }[ph];
+  if ($('#mr-hint').textContent !== hint) $('#mr-hint').textContent = hint;
+  $('#mr-banner').hidden = ph !== 'mixing';
+  if (ph === 'mixing') { const d = MR.mixDays || 0; $('#mr-banner-text').textContent = d === 0 ? 'Same day: tagged blobs have no time to spread out' : `${d} day${d === 1 ? '' : 's'} later: tagged blobs are spreading out from the field station`; }
+  const known1 = MR.s > 0 && idx >= 1, known2 = ph === 'done';
+  const sv = known1 ? MR.s : null, nv = known2 ? MR.n : null, xv = known2 ? MR.x : null;
+  let html = `<i>N</i><span class="eq">=</span><span class="frac"><span>${q(sv, 'cs')} × ${q(nv, 'cn')}</span><span>${q(xv, 'cx')}</span></span>`;
+  if (known2 && MR.x > 0) html += `<span class="eq">=</span><span class="frac"><span><b>${fmt(MR.s * MR.n)}</b></span><span><b>${MR.x}</b></span></span><span class="eq">=</span><b class="res">${fmt(MR.est, 1)}</b>`;
+  else if (known2) html += `<span class="eq">=</span><span class="unit">cannot divide by 0</span>`;
+  const sub = $('#mr-sub'); if (sub.dataset.h !== html) { sub.innerHTML = html; sub.dataset.h = html; }
+  $('#mr-sub-note').textContent = known2 && MR.x > 0 ? `Estimate: about ${fmt(Math.round(MR.est))} blobs live in this meadow.` : '';
+  const hide = MR.hidden;
+  $('#mr-c-total').textContent = hide ? '?' : fmt(N);
+  $('#mr-c-tag').textContent = fmt(MR.voles.filter(v => v.marked && v.where !== 'pen').length);
+  $('#mr-trialno').textContent = `Trial ${MR.log.length + (ph === 'done' ? 0 : 1)}`;
+  $('#mr-r-s').textContent = known1 ? fmt(MR.s) : '–';
+  $('#mr-r-n').textContent = known2 ? fmt(MR.n) : '–';
+  $('#mr-r-x').textContent = known2 ? fmt(MR.x) : '–';
+  $('#mr-r-est').textContent = known2 ? (MR.est ? fmt(Math.round(MR.est)) : 'undefined') : '–';
+  $('#mr-r-true').textContent = hide ? 'hidden' : fmt(N);
+  const e = $('#mr-r-err');
+  if (known2 && MR.est && !hide) { const err = (MR.est - N) / N * 100; e.textContent = (err >= 0 ? '+' : '') + err.toFixed(1) + '%'; e.style.color = Math.abs(err) <= 10 ? 'var(--moss-2)' : 'var(--red)'; }
+  else { e.textContent = known2 && hide ? 'hidden' : '–'; e.style.color = ''; }
+}
+
+function mrLogTable() {
+  const t = $('#mr-log');
+  if (!MR.log.length) { t.innerHTML = '<tbody><tr><td class="empty" colspan="9">Complete a trial and it will be recorded here.</td></tr></tbody>'; return; }
+  const hide = MR.hidden;
+  t.innerHTML = '<thead><tr><th>Trial</th><th>s</th><th>n</th><th>x</th><th>Estimated N = sn/x</th><th>True N</th><th>Error</th><th>Mixing time</th><th>Trap response</th></tr></thead><tbody>' +
+    MR.log.slice().reverse().map(r => {
+      const err = r.est ? (r.est - r.N) / r.N * 100 : null;
+      const cls = err == null || hide ? '' : Math.abs(err) <= 10 ? 'good' : 'bad';
+      return `<tr><td>${r.trial}</td><td>${r.s}</td><td>${r.n}</td><td>${r.x}</td><td>${r.est ? fmt(r.est, 1) : 'undefined (x = 0)'}</td><td>${hide ? 'hidden' : r.N}</td><td class="${cls}">${hide ? 'hidden' : err == null ? '–' : (err >= 0 ? '+' : '') + err.toFixed(1) + '%'}</td><td>${r.mix} days</td><td>${trapText(r.trap)}</td></tr>`;
+    }).join('') + '</tbody>';
+}
+const trapText = v => (Math.abs(v) < .05 ? 'Neutral' : v < 0 ? 'Trap-shy' : 'Trap-happy');
+function mrLogRows() { return [['Trial', 's', 'n', 'x', 'Estimated N', 'True N', 'Error %', 'Mixing time (days)', 'Trap response']].concat(MR.log.map(r => [r.trial, r.s, r.n, r.x, r.est ? r.est.toFixed(2) : 'undefined', r.N, r.est ? ((r.est - r.N) / r.N * 100).toFixed(2) : '', r.mix, trapText(r.trap)])); }
+
+/* ---------- repeated trials: random sampling error ---------- */
+function mrBatch() {
+  const N = val('mr-N'), s = Math.min(val('mr-s'), N - 1), n = Math.min(val('mr-n'), N), w = trapW(), T = +$('#mr-trials').value;
+  const est = [], chap = [], rows = []; let invalid = 0;
+  for (let i = 0; i < T; i++) {
+    let m = s, u = N - s, x = 0;
+    for (let j = 0; j < n && m + u > 0; j++) { if (Math.random() * (m * w + u) < m * w) { x++; m--; } else u--; }
+    const c = (s + 1) * (n + 1) / (x + 1) - 1; chap.push(c);
+    rows.push([i + 1, s, n, x, x ? (s * n / x).toFixed(2) : 'undefined', c.toFixed(2)]);
+    if (x === 0) { invalid++; continue; } est.push(s * n / x);
+  }
+  MR.batch = { N, s, n, w, trap: val('mr-trap'), T, est, chap, invalid, rows };
+  mrBatchUI(); Sound.play('ok');
+}
+function mrBatchUI() {
+  const b = MR.batch, hide = MR.hidden, dl = $('#mr-batch-stats');
+  if (!b) {
+    dl.innerHTML = '<div class="em">Choose a number of trials and press Run trials. Then change s and n and run again to see how sample size changes the spread.</div>';
+    MR.plot.draw({ xmin: 0, xmax: 1, ymin: 0, ymax: 1, xlabel: 'Estimated population (N)', ylabel: 'Number of trials', empty: 'No trials run yet' });
+    return;
+  }
+  const e = b.est.slice().sort((a, c) => a - c), k = e.length;
+  const mean = k ? e.reduce((a, c) => a + c, 0) / k : NaN;
+  const sd = k > 1 ? Math.sqrt(e.reduce((a, c) => a + (c - mean) ** 2, 0) / (k - 1)) : NaN;
+  const pc = p => (k ? e[Math.min(k - 1, Math.max(0, Math.round(p * (k - 1))))] : NaN);
+  const within = k ? e.filter(v => Math.abs(v - b.N) <= .1 * b.N).length / b.T * 100 : 0;
+  const chapMean = b.chap.reduce((a, c) => a + c, 0) / b.chap.length;
+  const err = (mean - b.N) / b.N * 100;
+  dl.innerHTML = `
+    <dt>Settings</dt><dd>s = ${b.s}, n = ${b.n}</dd>
+    <dt>Trials run</dt><dd>${fmt(b.T)}</dd>
+    <dt>Trials with x = 0 (no estimate)</dt><dd>${fmt(b.invalid)}</dd>
+    <dt>Mean estimate</dt><dd>${fmt(mean, 0)}</dd>
+    <dt>Spread (standard deviation)</dt><dd>± ${fmt(sd, 0)}</dd>
+    <dt>Middle 95% of estimates</dt><dd>${fmt(pc(.025), 0)} to ${fmt(pc(.975), 0)}</dd>
+    <dt>True population</dt><dd>${hide ? 'hidden' : fmt(b.N)}</dd>
+    <dt>Mean error</dt><dd>${hide ? 'hidden' : (err >= 0 ? '+' : '') + err.toFixed(1) + '%'}</dd>
+    <dt>Trials within ±10% of true N</dt><dd>${hide ? 'hidden' : within.toFixed(0) + '%'}</dd>
+    <dt>Chapman-corrected mean</dt><dd>${fmt(chapMean, 0)}</dd>
+    <div class="em">${mrBatchVerdict(b, mean, sd, err, hide)}</div>`;
+  const hi = Math.max(b.N * 2, pc(.99) * 1.05), bins = 30, step = hi / bins, cnt = new Array(bins).fill(0);
+  b.est.forEach(v => { cnt[Math.min(bins - 1, Math.floor(v / step))]++; });
+  const vl = [{ x: mean, color: TH.tag, label: `Mean ${fmt(mean, 0)}`, dash: [], width: 2.2 }];
+  if (!hide) vl.unshift({ x: b.N, color: TH.ink, label: `True N ${b.N}`, row: 1, width: 2 });
+  MR.plot.draw({ xmin: 0, xmax: hi, ymin: 0, ymax: Math.max(...cnt, 1) * 1.15, xlabel: 'Estimated population, N = sn/x', ylabel: 'Number of trials',
+    bars: { data: cnt.map((c, i) => [i * step, (i + 1) * step, c]), color: TH.water, alpha: .78 }, vlines: vl });
+}
+function mrBatchVerdict(b, mean, sd, err, hide) {
+  const cv = sd / mean * 100;
+  let t = `With samples of ${b.s} and ${b.n}, estimates typically land within about ±${fmt(sd, 0)} of the mean (${cv.toFixed(0)}% variation). `;
+  t += cv > 25 ? 'That is a lot of random sampling error: larger samples would give a more reliable estimate.' : cv > 12 ? 'Moderate sampling error. Larger samples would narrow the spread.' : 'Low sampling error: these sample sizes give fairly reliable estimates.';
+  if (!hide && Math.abs(b.trap) > .05) t += b.trap < 0 ? ' Tagged blobs avoid traps here, so x is too small and N is overestimated.' : ' Tagged blobs seek out traps here, so x is too large and N is underestimated.';
+  else if (!hide && err > 3) t += ' The mean sits a little above the true value: the simple formula overestimates slightly with small samples, which the Chapman version corrects.';
+  return t;
+}
+function mrBatchRows() {
+  const b = MR.batch; if (!b) return [];
+  return [['Trial', 's', 'n', 'x', 'Lincoln-Petersen N', 'Chapman N']].concat(b.rows).concat([[], ['True N', MR.hidden ? 'hidden' : b.N], ['Trap response', trapText(b.trap)]]);
+}
+
+function mrInit() {
+  MR.st = makeStage($('#mr-canvas'), (ow, oh) => {
+    if (!MR.ready) return; const fx = MR.st.w / ow, fy = MR.st.h / oh; mrLayout(); MR.bg = null;
+    MR.voles.forEach(v => { v.x *= fx; v.y *= fy; v.path.forEach(p => { p.x *= fx; p.y *= fy; }); });
+  });
+  MR.plot = new Plot($('#mr-hist'));
+  buildSliders('#mr-sliders', [
+    { id: 'mr-N', label: 'True population size', min: 50, max: 400, step: 10, val: 200, fmt: v => (MR.hidden ? 'hidden' : `${v} blobs`), on: () => mrNewPopulation() },
+    { id: 'mr-s', label: 'First capture size (s)', min: 10, max: 150, step: 5, val: 40, fmt: v => `${v} blobs`, on: () => mrUI() },
+    { id: 'mr-n', label: 'Second capture size (n)', min: 10, max: 150, step: 5, val: 40, fmt: v => `${v} blobs`, on: () => mrUI() },
+    { id: 'mr-mix', label: 'Time before second capture', min: 0, max: 14, step: 1, val: 14, fmt: v => (v === 0 ? 'Same day' : `${v} day${v === 1 ? '' : 's'}`), hint: 'Tagged blobs are released together at the field station. They need time to spread out before you trap again.' },
+    { id: 'mr-trap', label: 'Trap response of tagged blobs', min: -1, max: 1, step: .1, val: 0, fmt: v => { const w = Math.exp(1.2 * v); return Math.abs(v) < .05 ? 'Neutral' : `${v < 0 ? 'Trap-shy' : 'Trap-happy'}, ${w.toFixed(1)}× as catchable`; }, hint: 'Neutral matches the method’s assumption. Change it to see what happens when it breaks.' }
+  ]);
+  $('#mr-next').onclick = () => { Sound.play('click'); mrNext(); };
+  $('#mr-auto').onclick = () => { MR.auto = !MR.auto; MR.autoT = .5; if (MR.auto && MR.phase === 'done') mrNext(); mrUI(); };
+  $('#mr-reset').onclick = () => mrNewPopulation();
+  $('#mr-hide').onchange = e => { MR.hidden = e.target.checked; refreshSlider('mr-N'); mrUI(); mrLogTable(); mrBatchUI(); };
+  $('#mr-batch').onclick = mrBatch;
+  $('#mr-batch-copy').onclick = () => copyRows(mrBatchRows());
+  $('#mr-batch-csv').onclick = () => downloadRows('mark-recapture-repeated-trials.csv', mrBatchRows());
+  $('#mr-log-copy').onclick = () => copyRows(mrLogRows());
+  $('#mr-log-csv').onclick = () => downloadRows('mark-recapture-trial-log.csv', mrLogRows());
+  $('#mr-log-clear').onclick = () => { MR.log = []; mrLogTable(); mrUI(); };
+  mrLogTable();
+}
+
+
+/* =====================================================================
+   OPTION 2 — EXPONENTIAL GROWTH (dN/dt = rN)
+   ===================================================================== */
+const EXP = { st: null, bg: null, plot: null, ready: false, N: 10, N0: 10, t: 0, th: 10, r0: .3, rChanged: false,
+  running: false, ended: false, hist: [], runs: [], sprites: [], pings: [], lastRec: 0, tD: null, t1k: null, nextId: 1 };
+const EXP_CAP = 380, EXP_MAX = 20000, RABBIT_SIZE = 7.2;
+const expR = () => val('exp-b') - val('exp-d');
+const RUN_COLORS = ['#7A68B4', '#B4607A', '#3F8BA6', '#A7862E', '#5E9C77', '#A2683F'];
+const expBox = () => ({ x: 0, y: 0, w: EXP.st.w, h: EXP.st.h });
+const newRabbit = (p, ph) => ({ x: p.x, y: p.y, a: rand(0, TAU), v: rand(18, 34), ph: ph == null ? rand(0, TAU) : ph });
+
+function expSaveRun() {
+  if (EXP.t < .5 || EXP.hist.length < 4) return;
+  const id = EXP.nextId++;
+  EXP.runs.push({ id, r: EXP.rChanged ? null : EXP.r0, b: EXP.b0, d: EXP.d0, N0: EXP.N0, pts: EXP.hist.map(p => [p[0], p[1]]), tD: EXP.tD, t1k: EXP.t1k, tEnd: EXP.t, Nend: EXP.N, color: RUN_COLORS[(id - 1) % RUN_COLORS.length] });
+  if (EXP.runs.length > 6) EXP.runs.shift();
+}
+function expReset(save) {
+  if (save) expSaveRun();
+  EXP.N0 = val('exp-N0'); EXP.N = EXP.N0; EXP.th = EXP.N0; EXP.t = 0; EXP.r0 = expR(); EXP.b0 = val('exp-b'); EXP.d0 = val('exp-d'); EXP.rChanged = false; EXP.extinct = false;
+  EXP.hist = [[0, EXP.N0, EXP.N0]]; EXP.lastRec = 0; EXP.tD = EXP.t1k = null; EXP.running = false; EXP.ended = false; EXP.pings = [];
+  EXP.sprites = []; if (EXP.ready) for (let i = 0; i < EXP.N0; i++) EXP.sprites.push(newRabbit(randIn(expBox(), 14, EXP.bg && EXP.bg.pond)));
+  $('#exp-banner').hidden = true; expUI(); expTable(); expChart();
+}
+function expToggle() {
+  if (EXP.ended) return;
+  EXP.running = !EXP.running; Sound.play('click'); expUI();
+}
+function expTick(dt) {
+  if (!EXP.ready) { if (EXP.st.w < 80) return; const go = EXP.running; EXP.ready = true; expBuildBg(); expReset(false); EXP.running = go; }
+  const box = expBox(), pond = EXP.bg.pond;
+  for (const s of EXP.sprites) wander(s, dt, box, s.v, pond);
+  if (!EXP.running || EXP.ended) return;
+  const bRate = val('exp-b'), dRate = val('exp-d'), r = bRate - dRate;
+  if (Math.abs(bRate - EXP.b0) > 1e-9 || Math.abs(dRate - EXP.d0) > 1e-9) EXP.rChanged = true;
+  EXP.t += dt; EXP.th *= Math.exp(r * dt);
+  const b = poisson(bRate * EXP.N * dt), dd = Math.min(EXP.N + b, poisson(dRate * EXP.N * dt));
+  EXP.N += b - dd;
+  while (EXP.sprites.length > Math.min(EXP.N, EXP_CAP)) { const i = (Math.random() * EXP.sprites.length) | 0, s = EXP.sprites[i]; EXP.sprites.splice(i, 1); if (EXP.pings.length < 40) EXP.pings.push({ x: s.x, y: s.y, t: .9, T: .9, kind: 'death' }); }
+  if (dd > 0) Sound.play('death');
+  if (b > 0) {
+    const add = Math.min(b, EXP_CAP - EXP.sprites.length, Math.max(0, EXP.N - EXP.sprites.length));
+    for (let i = 0; i < add; i++) {
+      const par = EXP.sprites[(Math.random() * EXP.sprites.length) | 0]; const p = par ? { x: par.x + rand(-26, 26), y: par.y + rand(-26, 26) } : randIn(box, 14, pond);
+      const kid = newRabbit(p); keepIn(kid, box); avoidPond(kid, pond); EXP.sprites.push(kid);
+      if (EXP.pings.length < 40) EXP.pings.push({ x: kid.x, y: kid.y, t: .6, T: .6, kind: 'birth' });
+    }
+    Sound.play('birth');
+  }
+  if (!EXP.tD && EXP.N >= 2 * EXP.N0) EXP.tD = EXP.t;
+  if (!EXP.t1k && EXP.N >= 1000) EXP.t1k = EXP.t;
+  if (EXP.t - EXP.lastRec >= .1) { EXP.hist.push([EXP.t, EXP.N, EXP.th]); EXP.lastRec = EXP.t; }
+  if (EXP.N <= 0) { EXP.N = 0; EXP.ended = true; EXP.extinct = true; EXP.running = false; EXP.hist.push([EXP.t, 0, EXP.th]); Sound.play('alert'); expUI(); expTable(); }
+  if (EXP.N >= EXP_MAX) { EXP.ended = true; EXP.running = false; EXP.hist.push([EXP.t, EXP.N, EXP.th]); $('#exp-banner').hidden = false; Sound.play('alert'); expUI(); expTable(); }
+}
+function expBuildBg() { const { w, h, dpr } = EXP.st; EXP.bg = paintTerrain(w, h, dpr, { seed: 21, pal: 'meadow', pond: [.82, .78, .11], rocks: 3, flowers: 2400 }); }
+function expRender(dt) {
+  const { ctx: g, w, h } = EXP.st; if (!EXP.ready || w < 80) return;
+  if (!EXP.bg || EXP.bg.w !== w || EXP.bg.h !== h || EXP.bg.dpr !== EXP.st.dpr) expBuildBg();
+  g.drawImage(EXP.bg.canvas, 0, 0, w, h);
+  for (const s of EXP.sprites) drawRabbit(g, s.x, s.y, s.a, RABBIT_SIZE, { ph: s.ph, hu: s.hu });
+  drawPings(g, EXP.pings, dt);
+}
+function expUI() {
+  if (!EXP.ready) return;
+  const bR = val('exp-b'), dR = val('exp-d'), r = bR - dR, N = EXP.N, t = EXP.t;
+  const play = $('#exp-play'); const label = EXP.extinct ? 'Died out' : EXP.ended ? 'Limit reached' : EXP.running ? 'Pause' : t > 0 ? 'Resume growth' : 'Start growth';
+  if (play.textContent !== label) play.textContent = label; play.disabled = EXP.ended;
+  $('#exp-c-t').textContent = t.toFixed(1); $('#exp-c-N').textContent = fmt(N);
+  const cap = $('#exp-c-cap'); if (N > EXP.sprites.length) { cap.hidden = false; cap.textContent = `Showing ${fmt(EXP.sprites.length)} of ${fmt(N)} blobs`; } else cap.hidden = true;
+  const g1 = `<span class="frac"><span>d<i>N</i></span><span>d<i>t</i></span></span><span class="eq">=</span>(<i>b</i> − <i>d</i>)<i class="cN">N</i><span class="eq">=</span>(<b>${bR.toFixed(2)}</b> − <b>${dR.toFixed(2)}</b>) × <b class="cN">${fmt(N)}</b><span class="eq">=</span><b class="res">${fmt(r * N, 1)}</b><span class="unit">blobs per month (r = ${r.toFixed(2)})</span>`;
+  const pred = EXP.N0 * Math.exp(r * t);
+  const g2 = EXP.rChanged
+    ? `<i>N</i>(<i>t</i>)<span class="eq">=</span><i>N</i><sub>0</sub>e<sup><i>rt</i></sup><span class="unit">r was changed mid-run, so the dashed prediction follows each r in turn (now ${fmt(EXP.th)})</span>`
+    : `<i>N</i>(<i>t</i>)<span class="eq">=</span><i>N</i><sub>0</sub>e<sup><i>rt</i></sup><span class="eq">=</span><b>${EXP.N0}</b> × e<sup><b class="cr">${r.toFixed(2)}</b>×<b>${t.toFixed(1)}</b></sup><span class="eq">=</span><b class="res">${fmt(pred)}</b><span class="unit">predicted, simulated ${fmt(N)}</span>`;
+  const a = $('#exp-sub'), b = $('#exp-sub2');
+  if (a.dataset.h !== g1) { a.innerHTML = g1; a.dataset.h = g1; } if (b.dataset.h !== g2) { b.innerHTML = g2; b.dataset.h = g2; }
+  $('#exp-k-N').textContent = fmt(N);
+  $('#exp-k-g').innerHTML = `${fmt(r * N, 1)} <small>/month</small>`;
+  $('#exp-k-td').innerHTML = r > 0 ? `${(Math.LN2 / r).toFixed(2)} <small>months</small>` : 'never';
+  $('#exp-k-tdo').innerHTML = EXP.tD ? `${EXP.tD.toFixed(2)} <small>months</small>` : '–';
+  $('#exp-k-1k').innerHTML = EXP.t1k ? `${EXP.t1k.toFixed(1)} <small>months</small>` : '–';
+  $('#exp-k-t').textContent = t.toFixed(1);
+  const hint = EXP.extinct ? 'Deaths outnumbered births and the population died out. Press Reset and raise b or lower d.' : r <= 0 && !EXP.ended ? 'With d ≥ b, r is zero or negative, so the population cannot grow. Raise the birth rate.' : EXP.ended ? 'The population hit 20,000. Press Reset to save this run, then try a different r.'
+    : EXP.running ? (N < 100 ? 'Growth looks slow at first because there are only a few parents.' : N < 2000 ? 'Each new blob becomes a parent too, so growth keeps speeding up.' : 'The curve is now almost vertical. This is why exponential growth cannot last.')
+    : t > 0 ? 'Paused. Press Resume, or Reset to save this run for comparison.' : 'Press Start and watch the curve bend upward.';
+  if ($('#exp-hint').textContent !== hint) $('#exp-hint').textContent = hint;
+}
+function expChart() {
+  if (!EXP.plot) return;
+  const log = $('#exp-log').checked, runs = EXP.runs;
+  const tEnd = Math.max(10, Math.ceil(EXP.t + 1));
+  const xmax = Math.max(tEnd, ...runs.map(r => Math.ceil(r.tEnd)));
+  let ymax = Math.max(50, EXP.N * 1.18, EXP.th * 1.05);
+  if (log) ymax = Math.max(ymax, ...runs.map(r => r.Nend * 1.6), EXP.N * 1.6);
+  const series = runs.map(r => ({ points: r.pts, color: r.color, width: 2, alpha: .5, endLabel: r.r == null ? 'r varied' : `r = ${r.r.toFixed(2)}` }));
+  series.push({ points: EXP.hist.map(p => [p[0], p[2]]), color: TH.ink, width: 1.6, dash: [6, 5], label: 'Prediction N₀e^(rt)' });
+  series.push({ points: EXP.hist.map(p => [p[0], p[1]]), color: TH.moss, width: 3, label: `This run (r = ${expR().toFixed(2)})` });
+  EXP.plot.draw({ xmin: 0, xmax, ymin: log ? 1 : 0, ymax, log, xlabel: 'Time (months)', ylabel: log ? 'Population N (log scale)' : 'Population N', series });
+}
+function expRowsData() {
+  const rows = EXP.runs.map(r => ({ name: `Run ${r.id}`, r: r.r, b: r.r == null ? null : r.b, d: r.r == null ? null : r.d, N0: r.N0, tD: r.tD, t1k: r.t1k, Nend: r.Nend }));
+  if (EXP.t > 0) rows.push({ name: EXP.ended ? 'Current (ended)' : 'Current', r: EXP.rChanged ? null : expR(), b: EXP.rChanged ? null : val('exp-b'), d: EXP.rChanged ? null : val('exp-d'), N0: EXP.N0, tD: EXP.tD, t1k: EXP.t1k, Nend: EXP.N });
+  return rows;
+}
+function expTable() {
+  const t = $('#exp-table'), rows = expRowsData();
+  if (!rows.length) { t.innerHTML = '<tbody><tr><td class="empty" colspan="9">Run the simulation, then press Reset to save it here.</td></tr></tbody>'; return; }
+  t.innerHTML = '<thead><tr><th>Run</th><th>b</th><th>d</th><th>r = b − d</th><th>N₀</th><th>Doubling time, simulated</th><th>Doubling time, ln 2 / r</th><th>Time to reach 1,000</th><th>Final N</th></tr></thead><tbody>' +
+    rows.map(r => `<tr><td>${r.name}</td><td>${r.b == null ? 'varied' : r.b.toFixed(2)}</td><td>${r.d == null ? 'varied' : r.d.toFixed(2)}</td><td>${r.r == null ? 'varied' : r.r.toFixed(2)}</td><td>${r.N0}</td><td>${r.tD ? r.tD.toFixed(2) + ' mo' : '–'}</td><td>${r.r == null || r.r <= 0 ? '–' : (Math.LN2 / r.r).toFixed(2) + ' mo'}</td><td>${r.t1k ? r.t1k.toFixed(1) + ' mo' : '–'}</td><td>${fmt(r.Nend)}</td></tr>`).join('') + '</tbody>';
+}
+function expCsvRows() {
+  const out = [['Run', 'b', 'd', 'r = b - d', 'N0', 'Doubling time simulated (months)', 'Doubling time ln2/r (months)', 'Time to 1000 (months)', 'Final N']];
+  expRowsData().forEach(r => out.push([r.name, r.b == null ? 'varied' : r.b, r.d == null ? 'varied' : r.d, r.r == null ? 'varied' : r.r.toFixed(2), r.N0, r.tD ? r.tD.toFixed(3) : '', r.r == null || r.r <= 0 ? '' : (Math.LN2 / r.r).toFixed(3), r.t1k ? r.t1k.toFixed(3) : '', r.Nend]));
+  out.push([], ['Current run time series'], ['Time (months)', 'Simulated N', 'Predicted N0*e^(rt)']);
+  EXP.hist.forEach(p => out.push([p[0].toFixed(2), p[1], p[2].toFixed(1)]));
+  return out;
+}
+function expInit() {
+  EXP.st = makeStage($('#exp-canvas'), (ow, oh) => {
+    if (!EXP.ready) return; const fx = EXP.st.w / ow, fy = EXP.st.h / oh; EXP.bg = null; expBuildBg();
+    EXP.sprites.forEach(s => { s.x *= fx; s.y *= fy; });
+  });
+  EXP.plot = new Plot($('#exp-chart'));
+  buildSliders('#exp-sliders', [
+    { id: 'exp-N0', label: 'Starting population (N₀)', min: 2, max: 50, step: 1, val: 20, fmt: v => `${v} blobs`, on: () => { if (!EXP.running && EXP.t === 0) expReset(false); }, hint: 'Takes effect when you reset.' },
+    { id: 'exp-b', label: 'Birth rate (b)', min: 0, max: 1.2, step: .01, val: .4, fmt: v => `${v.toFixed(2)} per blob per month`, on: () => { if (!EXP.running && EXP.t === 0) expReset(false); expUI(); expTable(); } },
+    { id: 'exp-d', label: 'Death rate (d)', min: 0, max: 1, step: .01, val: .1, fmt: v => `${v.toFixed(2)} per blob per month`, on: () => { if (!EXP.running && EXP.t === 0) expReset(false); expUI(); expTable(); }, hint: 'r = b − d. Doubling time = ln 2 / r.' }
+  ]);
+  $('#exp-play').onclick = expToggle;
+  $('#exp-reset').onclick = () => { expReset(true); toast(EXP.runs.length ? 'Run saved for comparison' : 'Reset'); };
+  $('#exp-log').onchange = expChart;
+  $('#exp-clear').onclick = () => { EXP.runs = []; EXP.nextId = 1; expTable(); expChart(); };
+  $('#exp-copy').onclick = () => copyRows(expCsvRows());
+  $('#exp-csv').onclick = () => downloadRows('exponential-growth-runs.csv', expCsvRows());
+  $('#exp-to-log').onclick = () => switchTab('log');
+}
+
+/* =====================================================================
+   OPTION 3 — LOGISTIC GROWTH (dN/dt = rN(K − N)/K)
+   ===================================================================== */
+const LOG = { st: null, bg: null, ready: false, N: 10, N0: 10, K: 300, K0: 300, t: 0, th: 10, running: false, extinct: false,
+  hist: [], sprites: [], pings: [], ev: [], win: [], stableT: 0, tHalf: null, t95: null, lastRec: 0, obs: [], obsLast: null,
+  patches: [], plots: {}, D0: .15 };
+const LOG_CAP = 520;
+const logBirth = (N, r, K) => LOG.D0 + r - r * N / (2 * K);
+const logDeath = (N, r, K) => LOG.D0 + r * N / (2 * K);
+const logBox = () => ({ x: 0, y: 0, w: LOG.st.w, h: LOG.st.h });
+
+function logBuildBg() {
+  const { w, h, dpr } = LOG.st;
+  LOG.bg = paintTerrain(w, h, dpr, { seed: 33, pal: 'meadow', pond: [.14, .8, .1], rocks: 4, density: 85, flowers: 1800 });
+  const R = mulberry32(77); LOG.patches = [];
+  for (let i = 0; i < 260; i++) {
+    let p; let tries = 0; do { p = { x: R() * w, y: R() * h }; tries++; } while (inPond(p, LOG.bg.pond, 18) && tries < 20);
+    LOG.patches.push({ x: p.x, y: p.y, rx: 9 + R() * 22, ry: 6 + R() * 15, rot: R() * Math.PI, k: R() });
+  }
+}
+function logReset() {
+  LOG.N0 = val('log-N0'); LOG.N = LOG.N0; LOG.K = LOG.K0 = val('log-K'); LOG.t = 0; LOG.th = LOG.N0;
+  LOG.hist = [[0, LOG.N0, LOG.K, LOG.N0]]; LOG.ev = []; LOG.win = []; LOG.stableT = 0; LOG.tHalf = LOG.t95 = null; LOG.lastRec = 0;
+  LOG.obs = []; LOG.obsLast = [0, LOG.N0]; LOG.running = false; LOG.extinct = false; LOG.pings = [];
+  LOG.sprites = []; if (LOG.ready) for (let i = 0; i < Math.min(LOG.N0, LOG_CAP); i++) LOG.sprites.push(newRabbit(randIn(logBox(), 14, LOG.bg.pond)));
+  logUI(); logCharts();
+}
+function logSetK(K, label) {
+  LOG.K = clamp(Math.round(K), 30, 600); setSlider('log-K', LOG.K);
+  if (LOG.t > 0) { LOG.ev.push({ t: LOG.t, label }); LOG.hist.push([LOG.t, LOG.N, LOG.K, LOG.th]); }
+  LOG.stableT = 0; LOG.tHalf = LOG.N >= LOG.K / 2 ? LOG.tHalf : null; LOG.t95 = null;
+  logUI(); logCharts();
+}
+function logToggle() { if (LOG.extinct) return; LOG.running = !LOG.running; Sound.play('click'); logUI(); }
+function logTick(dt) {
+  if (!LOG.ready) { if (LOG.st.w < 80) return; const go = LOG.running; LOG.ready = true; logBuildBg(); logReset(); LOG.running = go; }
+  const box = logBox(), pond = LOG.bg.pond, crowd = clamp(LOG.N / LOG.K, 0, 1.5);
+  for (const s of LOG.sprites) wander(s, dt, box, s.v * (1 - .35 * Math.min(crowd, 1)), pond);
+  if (!LOG.running) return;
+  const r = val('log-r'), K = LOG.K, N = LOG.N; LOG.t += dt;
+  /* per-blob birth rate falls and death rate rises with crowding; they cross at K, so b − d = r(1 − N/K) */
+  const B = poisson(Math.max(0, logBirth(N, r, K)) * N * dt);
+  const D = Math.min(N + B, poisson(logDeath(N, r, K) * N * dt));
+  LOG.N = N + B - D;
+  LOG.win.push([LOG.t, B, D]); while (LOG.win.length && LOG.win[0][0] < LOG.t - 1) LOG.win.shift();
+  LOG.th = Math.max(0, LOG.th + r * LOG.th * (1 - LOG.th / K) * dt);
+  /* keep the drawn rabbits in step with N */
+  for (let i = 0; i < B && LOG.sprites.length < Math.min(LOG.N, LOG_CAP); i++) {
+    const par = LOG.sprites[(Math.random() * LOG.sprites.length) | 0]; const p = par ? { x: par.x + rand(-26, 26), y: par.y + rand(-26, 26) } : randIn(box, 14, pond);
+    const kid = newRabbit(p); keepIn(kid, box); avoidPond(kid, pond); LOG.sprites.push(kid);
+    if (LOG.pings.length < 60) LOG.pings.push({ x: kid.x, y: kid.y, t: .7, T: .7, kind: 'birth' });
+  }
+  while (LOG.sprites.length > Math.min(LOG.N, LOG_CAP)) {
+    const i = (Math.random() * LOG.sprites.length) | 0; const d = LOG.sprites[i]; LOG.sprites.splice(i, 1);
+    if (LOG.pings.length < 60) LOG.pings.push({ x: d.x, y: d.y, t: .9, T: .9, kind: 'death' });
+  }
+  while (LOG.sprites.length < Math.min(LOG.N, LOG_CAP)) LOG.sprites.push(newRabbit(randIn(box, 14, pond)));
+  if (B) Sound.play('birth'); if (D) Sound.play('death');
+  if (LOG.t - LOG.lastRec >= .1) { LOG.hist.push([LOG.t, LOG.N, LOG.K, LOG.th]); LOG.lastRec = LOG.t; }
+  if (LOG.t - LOG.obsLast[0] >= 1) { const [t0, n0] = LOG.obsLast; LOG.obs.push([(LOG.N + n0) / 2, (LOG.N - n0) / (LOG.t - t0)]); if (LOG.obs.length > 90) LOG.obs.shift(); LOG.obsLast = [LOG.t, LOG.N]; }
+  if (!LOG.tHalf && LOG.N >= K / 2 && LOG.N0 < K / 2) LOG.tHalf = LOG.t;
+  if (!LOG.t95 && LOG.N >= .95 * K && LOG.N0 < .95 * K) LOG.t95 = LOG.t;
+  LOG.stableT = Math.abs(LOG.N - K) <= .07 * K ? LOG.stableT + dt : 0;
+  if (LOG.N <= 0) { LOG.N = 0; LOG.running = false; LOG.extinct = true; Sound.play('alert'); logUI(); }
+}
+function logRender(dt) {
+  const { ctx: g, w, h } = LOG.st; if (!LOG.ready || w < 80) return;
+  if (!LOG.bg || LOG.bg.w !== w || LOG.bg.h !== h || LOG.bg.dpr !== LOG.st.dpr) logBuildBg();
+  g.drawImage(LOG.bg.canvas, 0, 0, w, h);
+  const f = clamp(LOG.N / LOG.K, 0, 1.6);
+  const count = Math.round(LOG.patches.length * clamp(f * .5, 0, .92));
+  for (let i = 0; i < count; i++) {
+    const p = LOG.patches[i]; g.fillStyle = 'rgba(150,118,78,.6)'; ell(g, p.x, p.y, p.rx, p.ry, p.rot);
+    g.fillStyle = 'rgba(112,86,56,.35)'; ell(g, p.x + p.rx * .15, p.y + p.ry * .1, p.rx * .55, p.ry * .5, p.rot);
+  }
+  if (f > .05) { g.fillStyle = `rgba(200,182,100,${Math.min(f, 1.3) * .1})`; g.fillRect(0, 0, w, h); }
+  for (const s of LOG.sprites) drawRabbit(g, s.x, s.y, s.a, RABBIT_SIZE, { ph: s.ph, hu: s.hu });
+  drawPings(g, LOG.pings, dt);
+}
+function logStatus() {
+  const N = LOG.N, K = LOG.K;
+  if (LOG.extinct) return ['bad', 'The population died out'];
+  if (LOG.t === 0 && !LOG.running) return ['', 'Ready to start'];
+  if (LOG.stableT > 1.5) return ['good', 'At carrying capacity: births ≈ deaths'];
+  if (N > 1.07 * K) return ['warn', 'Above K: deaths outnumber births'];
+  if (N < K / 2) return ['', 'Fast growth: food is plentiful'];
+  return ['warn', 'Slowing down: food is getting scarce'];
+}
+function logUI() {
+  if (!LOG.ready) return;
+  const r = val('log-r'), N = LOG.N, K = LOG.K, room = (K - N) / K;
+  const play = $('#log-play'); const label = LOG.extinct ? 'Died out' : LOG.running ? 'Pause' : LOG.t > 0 ? 'Resume growth' : 'Start growth';
+  if (play.textContent !== label) play.textContent = label; play.disabled = LOG.extinct;
+  $('#log-c-t').textContent = LOG.t.toFixed(1); $('#log-c-N').textContent = fmt(N); $('#log-c-K').textContent = fmt(K);
+  const [cls, txt] = logStatus(); const b = $('#log-status'); b.className = 'badge ' + cls; b.lastElementChild.textContent = txt;
+  const dn = r * N * room;
+  const html = `<span class="frac"><span>d<i>N</i></span><span>d<i>t</i></span></span><span class="eq">=</span><b class="cr">${r.toFixed(2)}</b> × <b class="cN">${fmt(N)}</b> × <span class="frac"><span>(<b class="cK">${fmt(K)}</b> − <b class="cN">${fmt(N)}</b>)</span><span><b class="cK">${fmt(K)}</b></span></span><span class="eq">=</span><b class="res">${fmt(dn, 1)}</b>`;
+  const sub = $('#log-sub'); if (sub.dataset.h !== html) { sub.innerHTML = html; sub.dataset.h = html; }
+  $('#log-sub-note').textContent = dn > .5 ? `The population is gaining about ${fmt(dn, 1)} blobs per month.` : dn < -.5 ? `The population is losing about ${fmt(-dn, 1)} blobs per month.` : 'Net growth is about zero: births and deaths balance.';
+  $('#log-k-N').textContent = fmt(N);
+  $('#log-k-pct').textContent = (N / K * 100).toFixed(0) + '%';
+  const sb = LOG.win.reduce((a, w) => a + w[1], 0), sd = LOG.win.reduce((a, w) => a + w[2], 0);
+  $('#log-k-b').textContent = LOG.t > 0 ? fmt(sb) : '–'; $('#log-k-d').textContent = LOG.t > 0 ? fmt(sd) : '–';
+  $('#log-k-half').innerHTML = LOG.tHalf ? `${LOG.tHalf.toFixed(1)} <small>months</small>` : '–';
+  $('#log-k-95').innerHTML = LOG.t95 ? `${LOG.t95.toFixed(1)} <small>months</small>` : '–';
+  $('#log-k-res').textContent = room.toFixed(2);
+  $('#log-meter').style.width = clamp(room * 100, 0, 100) + '%';
+  const hint = LOG.extinct ? 'Press Reset to try again.' : !LOG.running && LOG.t === 0 ? 'Press Start. Watch the growth slow as N gets close to K.'
+    : !LOG.running ? 'Paused. Try a Drought or Good season, then resume.' : logStatus()[1] + '.';
+  if ($('#log-hint').textContent !== hint) $('#log-hint').textContent = hint;
+}
+function logCharts() {
+  const P = LOG.plots; if (!P.a) return;
+  const r = val('log-r'), K = LOG.K, N = LOG.N;
+  const maxK = Math.max(...LOG.hist.map(p => p[2])), maxN = Math.max(...LOG.hist.map(p => p[1]));
+  const xmax = Math.max(20, Math.ceil(LOG.t * 1.08 + 1));
+  P.a.draw({ xmin: 0, xmax, ymin: 0, ymax: Math.max(maxK, maxN) * 1.14, xlabel: 'Time (months)', ylabel: 'Population N',
+    series: [
+      { points: LOG.hist.map(p => [p[0], p[2]]).concat([[Math.max(LOG.t, .01), K]]), color: TH.red, dash: [6, 4], width: 1.8, step: true, label: 'K' },
+      { points: LOG.hist.map(p => [p[0], p[3]]), color: TH.ink, dash: [3, 4], width: 1.6, label: 'Prediction' },
+      { points: LOG.hist.map(p => [p[0], p[1]]), color: TH.moss, width: 2.8, fill: .1, label: 'Simulated N' }
+    ],
+    vlines: LOG.ev.map((e, i) => ({ x: e.t, label: e.label, color: TH.tag, row: i % 2 })) });
+  const xN = Math.max(K * 1.25, N * 1.08, 20);
+  const curve = [], pc = []; for (let i = 0; i <= 80; i++) { const n = xN * i / 80; curve.push([n, r * n * (1 - n / K)]); pc.push([n, r * (1 - n / K)]); }
+  const cMin = Math.min(...curve.map(p => p[1])), oMin = LOG.obs.length ? Math.min(...LOG.obs.map(p => p[1])) : 0, oMax = LOG.obs.length ? Math.max(...LOG.obs.map(p => p[1])) : 0;
+  const ymax2 = Math.max(r * K / 4 * 1.3, oMax * 1.05, 1), ymin2 = Math.min(cMin, oMin, 0) * 1.1;
+  P.b.draw({ xmin: 0, xmax: xN, ymin: ymin2, ymax: ymax2, xlabel: 'Population N', ylabel: 'Growth rate dN/dt',
+    series: [{ points: LOG.obs, color: TH.muted, scatter: true, r: 2.6, alpha: .65, label: 'Measured' }, { points: curve, color: TH.gold, width: 2.4, label: 'rN(K−N)/K' }],
+    hlines: [{ y: 0, color: TH.line, dash: [] }],
+    vlines: [{ x: K / 2, label: 'K/2', color: TH.gold }, { x: K, label: 'K', color: TH.red, row: 1 }],
+    dots: [{ x: N, y: r * N * (1 - N / K), color: TH.moss, label: 'Now' }] });
+  const bl = [], dl = []; for (let i = 0; i <= 40; i++) { const n = xN * i / 40; bl.push([n, Math.max(0, logBirth(n, r, K))]); dl.push([n, logDeath(n, r, K)]); }
+  const ymax3 = Math.max(logBirth(0, r, K), logDeath(xN, r, K)) * 1.18;
+  P.c.draw({ xmin: 0, xmax: xN, ymin: 0, ymax: ymax3, xlabel: 'Population N', ylabel: 'Rate per blob per month',
+    series: [{ points: bl, color: TH.moss, width: 2.6, label: 'Birth rate' }, { points: dl, color: TH.red, width: 2.6, label: 'Death rate' }],
+    vlines: [{ x: K, label: 'K: births = deaths', color: TH.ink, align: 'right' }],
+    dots: [{ x: N, y: Math.max(0, logBirth(N, r, K)), color: TH.moss, r: 5 }, { x: N, y: logDeath(N, r, K), color: TH.red, r: 5 }] });
+}
+function logRows() {
+  const out = [['Time (months)', 'Simulated N', 'Carrying capacity K', 'Logistic prediction']];
+  LOG.hist.forEach(p => out.push([p[0].toFixed(2), p[1], p[2], p[3].toFixed(1)]));
+  if (LOG.ev.length) { out.push([], ['Environment changes'], ['Time (months)', 'Event']); LOG.ev.forEach(e => out.push([e.t.toFixed(2), e.label])); }
+  if (LOG.obs.length) { out.push([], ['Measured growth rate'], ['Population N', 'Measured dN/dt']); LOG.obs.forEach(o => out.push([o[0].toFixed(1), o[1].toFixed(2)])); }
+  return out;
+}
+function logInit() {
+  LOG.st = makeStage($('#log-canvas'), (ow, oh) => {
+    if (!LOG.ready) return; const fx = LOG.st.w / ow, fy = LOG.st.h / oh; LOG.bg = null; logBuildBg();
+    LOG.sprites.forEach(s => { s.x *= fx; s.y *= fy; });
+  });
+  LOG.plots = { a: new Plot($('#log-ch1')), b: new Plot($('#log-ch2')), c: new Plot($('#log-ch3')) };
+  buildSliders('#log-sliders', [
+    { id: 'log-N0', label: 'Starting population (N₀)', min: 2, max: 100, step: 1, val: 10, fmt: v => `${v} blobs`, on: () => { if (!LOG.running && LOG.t === 0) logReset(); }, hint: 'Takes effect when you reset.' },
+    { id: 'log-r', label: 'Intrinsic growth rate (r)', min: .05, max: 1, step: .01, val: .5, fmt: v => `${v.toFixed(2)} per month`, on: () => { logUI(); logCharts(); } },
+    { id: 'log-K', label: 'Carrying capacity (K)', min: 30, max: 600, step: 10, val: 300, fmt: v => `${v} blobs`,
+      on: v => { if (!LOG.running && LOG.t === 0) logReset(); else { LOG.K = v; LOG.stableT = 0; logUI(); } },
+      change: v => { if (LOG.t > 0) { LOG.ev.push({ t: LOG.t, label: `K set to ${v}` }); LOG.hist.push([LOG.t, LOG.N, LOG.K, LOG.th]); logCharts(); } },
+      hint: 'You can change K while it runs.' }
+  ]);
+  $('#log-play').onclick = logToggle;
+  $('#log-reset').onclick = logReset;
+  $('#log-drought').onclick = () => { logSetK(LOG.K * .6, 'Drought'); toast(`Drought: K falls to ${LOG.K}`); };
+  $('#log-wet').onclick = () => { logSetK(LOG.K * 1.4, 'Good season'); toast(`Good season: K rises to ${LOG.K}`); };
+  $('#log-undo').onclick = () => { logSetK(LOG.K0, 'Back to original K'); };
+  $('#log-copy').onclick = () => copyRows(logRows());
+  $('#log-csv').onclick = () => downloadRows('logistic-growth-data.csv', logRows());
+}
+
+
+/* =====================================================================
+   EXTENSION — WHOLE ECOSYSTEM (grass → rabbits → foxes)
+   ===================================================================== */
+const ECO = { st: null, plot: null, ready: false, cell: 14, cols: 0, rows: 0, grass: null, burn: null, off: null, offCtx: null, img: null, tex: null,
+  rabbits: [], foxes: [], burrows: [], goneR: 0, goneF: 0, pings: [], t: 0, running: false, biome: 'grassland', tool: 'rabbit', drought: 0, hist: [], lastRec: 0, ev: [], bannerT: 0, drag: false, lastApply: 0 };
+const BIOME = {
+  grassland: { regrow: 1, soil: [146, 116, 78], dry: [178, 166, 96], grass: [88, 140, 52], pal: 'meadow', name: 'Grassland' },
+  rainforest: { regrow: 1.25, soil: [88, 70, 50], dry: [86, 112, 56], grass: [42, 100, 44], pal: 'rainforest', name: 'Rainforest' },
+  desert: { regrow: .4, soil: [204, 176, 124], dry: [192, 172, 112], grass: [126, 146, 72], pal: 'desert', name: 'Desert' }
+};
+const ECO_CAP_R = 650, ECO_CAP_F = 40;
+const TUNE = { regrow: .05, rEat: .35, rConv: 20, rMet: 2, rFull: 70, rBirthE: 45, rBirthP: .2, fGain: 26, fRest: 3, fMet: 2, fBirthE: 50, fBirthP: .05, fVision: 70, fK: 18 };
+const FS = [38, 46, 54, 62, 72];
+const ecoBox = () => ({ x: 0, y: 0, w: ECO.st.w, h: ECO.st.h });
+const ci = (x, y) => clamp((y / ECO.cell) | 0, 0, ECO.rows - 1) * ECO.cols + clamp((x / ECO.cell) | 0, 0, ECO.cols - 1);
+const newEcoRabbit = (x, y, e) => ({ x, y, a: rand(0, TAU), e: e == null ? rand(35, 60) : e, age: 0, life: rand(45, 75), inf: 0, imm: 0, ph: rand(0, TAU), goal: null, hide: 0 });
+const newFox = (x, y, e) => ({ x, y, a: rand(0, TAU), e: e == null ? rand(45, 65) : e, age: 0, life: rand(60, 100), rest: 0, ph: rand(0, TAU) });
+
+function ecoGrid() {
+  const { w, h } = ECO.st; const cols = Math.ceil(w / ECO.cell), rows = Math.ceil(h / ECO.cell);
+  const old = ECO.grass, oc = ECO.cols, or = ECO.rows;
+  ECO.cols = cols; ECO.rows = rows; ECO.grass = new Float32Array(cols * rows); ECO.burn = new Float32Array(cols * rows);
+  for (let j = 0; j < rows; j++) for (let i = 0; i < cols; i++) ECO.grass[j * cols + i] = old ? old[clamp(Math.floor(j / rows * or), 0, or - 1) * oc + clamp(Math.floor(i / cols * oc), 0, oc - 1)] : rand(.35, .8);
+  ECO.off = document.createElement('canvas'); ECO.off.width = cols; ECO.off.height = rows; ECO.offCtx = ECO.off.getContext('2d'); ECO.img = ECO.offCtx.createImageData(cols, rows);
+  ECO.tex = paintTerrain(w, h, ECO.st.dpr, { seed: 41, pal: BIOME[ECO.biome].pal, overlay: true, density: 140, flowers: 5000 });
+  const R = mulberry32(8); ECO.burrows = [];
+  const spots = [[.18, .24], [.5, .16], [.82, .28], [.3, .72], [.68, .78], [.5, .5]];
+  spots.forEach(([fx, fy]) => ECO.burrows.push({ x: w * fx + (R() - .5) * w * .08, y: h * fy + (R() - .5) * h * .08 }));
+}
+function ecoReset() {
+  ECO.grass = null; ecoGrid(); ECO.rabbits = []; ECO.foxes = []; ECO.pings = []; ECO.t = 0; ECO.drought = 0; ECO.hist = []; ECO.lastRec = 0; ECO.ev = []; ECO.running = false; ECO.goneR = ECO.goneF = 0;
+  const box = ecoBox();
+  for (let i = 0; i < 40; i++) { const p = randIn(box, 12); ECO.rabbits.push(newEcoRabbit(p.x, p.y)); }
+  for (let i = 0; i < 4; i++) { const p = randIn(box, 20); ECO.foxes.push(newFox(p.x, p.y)); }
+  ecoRecord(); ecoUI(); ecoChart();
+}
+function ecoRecord() { const g = ECO.grass.reduce((a, b) => a + b, 0) / ECO.grass.length * 100; ECO.hist.push([ECO.t, ECO.rabbits.length, ECO.foxes.length, g]); if (ECO.hist.length > 400) ECO.hist.shift(); }
+function ecoBanner(text) { const b = $('#eco-banner'); b.textContent = text; b.hidden = false; ECO.bannerT = 4; }
+function ecoEvent(type) {
+  const box = ecoBox();
+  if (type === 'drought') { ECO.drought = 15; ecoBanner('Drought: the grass stops growing for a while'); }
+  if (type === 'rain') { for (let i = 0; i < ECO.grass.length; i++) { ECO.grass[i] = Math.min(1, ECO.grass[i] + .5); ECO.burn[i] = 0; } ECO.drought = 0; ecoBanner('Heavy rain: the grass grows back quickly'); }
+  if (type === 'disease') { const healthy = ECO.rabbits.filter(r => r.inf <= 0 && r.imm <= 0); for (let i = 0; i < Math.min(5, healthy.length); i++) healthy[(Math.random() * healthy.length) | 0].inf = 8; ecoBanner('Disease: an infection is spreading between blobs'); }
+  if (type === 'fire') {
+    const cx = rand(box.w * .25, box.w * .75), cy = rand(box.h * .25, box.h * .75), R = Math.min(box.w, box.h) * .3;
+    for (let j = 0; j < ECO.rows; j++) for (let i = 0; i < ECO.cols; i++) { const x = (i + .5) * ECO.cell, y = (j + .5) * ECO.cell; if ((x - cx) ** 2 + (y - cy) ** 2 < R * R) { ECO.grass[j * ECO.cols + i] = 0; ECO.burn[j * ECO.cols + i] = 8; } }
+    const kill = a => (a.x - cx) ** 2 + (a.y - cy) ** 2 < R * R * .6 && Math.random() < .7;
+    ECO.rabbits = ECO.rabbits.filter(a => { if (kill(a)) { ECO.pings.push({ x: a.x, y: a.y, t: .9, T: .9, kind: 'death' }); return false; } return true; });
+    ECO.foxes = ECO.foxes.filter(a => { if (kill(a)) { ECO.pings.push({ x: a.x, y: a.y, t: .9, T: .9, kind: 'death' }); return false; } return true; });
+    ecoBanner('Wildfire: a patch of the meadow has burned');
+  }
+  ECO.ev.push({ t: ECO.t, label: { drought: 'Drought', rain: 'Rain', disease: 'Disease', fire: 'Fire' }[type] });
+  Sound.play('alert'); ecoUI(); ecoChart();
+}
+function ecoApply(e) {
+  const r = ECO.st.canvas.getBoundingClientRect(); const x = e.clientX - r.left, y = e.clientY - r.top; ECO.lastApply = performance.now();
+  if (ECO.tool === 'rabbit' && ECO.rabbits.length < ECO_CAP_R) { ECO.rabbits.push(newEcoRabbit(x, y, 70)); ECO.pings.push({ x, y, t: .6, T: .6, kind: 'birth' }); }
+  else if (ECO.tool === 'fox' && ECO.foxes.length < ECO_CAP_F) { ECO.foxes.push(newFox(x, y, 90)); ECO.pings.push({ x, y, t: .6, T: .6, kind: 'birth' }); }
+  else if (ECO.tool === 'grass') { const rr = 30; for (let j = 0; j < ECO.rows; j++) for (let i = 0; i < ECO.cols; i++) { const cx = (i + .5) * ECO.cell, cy = (j + .5) * ECO.cell; if ((cx - x) ** 2 + (cy - y) ** 2 < rr * rr) { ECO.grass[j * ECO.cols + i] = 1; ECO.burn[j * ECO.cols + i] = 0; } } }
+  else if (ECO.tool === 'remove') {
+    const near = a => (a.x - x) ** 2 + (a.y - y) ** 2 < 26 * 26;
+    ECO.rabbits = ECO.rabbits.filter(a => !near(a)); ECO.foxes = ECO.foxes.filter(a => !near(a));
+  }
+  ecoUI();
+}
+function ecoTick(dt) {
+  if (!ECO.ready) { if (ECO.st.w < 80) return; const go = ECO.running; ECO.ready = true; ecoReset(); ECO.running = go; }
+  if (ECO.bannerT > 0) { ECO.bannerT -= dt / Math.max(G.speed, .5); if (ECO.bannerT <= 0) $('#eco-banner').hidden = true; }
+  if (!ECO.running) { for (const a of ECO.rabbits) a.ph += dt * 2; return; }
+  ECO.t += dt; const box = ecoBox(), cols = ECO.cols, G0 = ECO.grass, Bn = ECO.burn;
+  /* grass regrowth */
+  const rate = ECO.drought > 0 ? 0 : TUNE.regrow * val('eco-grass') * BIOME[ECO.biome].regrow;
+  if (ECO.drought > 0) ECO.drought -= dt;
+  for (let i = 0; i < G0.length; i++) { if (Bn[i] > 0) { Bn[i] -= dt; continue; } const b = G0[i]; if (b < 1) G0[i] = Math.min(1, b + rate * (.12 + b) * (1 - b) * dt); }
+  /* rabbits: graze, flee to burrows, breed by chance when well fed */
+  const rbm = [.5, .75, 1, 1.3, 1.6][val('eco-rb') - 1], R = ECO.rabbits, F = ECO.foxes, born = [];
+  for (let i = R.length - 1; i >= 0; i--) {
+    const a = R[i]; a.age += dt; a.ph += dt * 8; let sp, fx = 0, fy = 0, threat = false;
+    for (const f of F) { if (f.rest > 0) continue; const dx = a.x - f.x, dy = a.y - f.y, d2 = dx * dx + dy * dy; if (d2 < 70 * 70) { const d = Math.sqrt(d2) || 1; fx += dx / d; fy += dy / d; threat = true; } }
+    let hole = null, hd = 120 * 120; for (const b of ECO.burrows) { const d2 = (b.x - a.x) ** 2 + (b.y - a.y) ** 2; if (d2 < hd) { hd = d2; hole = b; } }
+    if (a.hide > 0) { a.hide -= dt; sp = 0; if (threat) a.hide = Math.max(a.hide, .8); }
+    else if (threat && hole) { a.a = steer(a.a, Math.atan2(hole.y - a.y, hole.x - a.x), 9 * dt); sp = 48; if (hd < 11 * 11) { a.hide = rand(2.5, 5); a.x = hole.x + rand(-3, 3); a.y = hole.y + rand(-3, 3); } }
+    else if (threat) { a.a = steer(a.a, Math.atan2(fy, fx), 7 * dt); sp = 48; }
+    else {
+      const k = ci(a.x, a.y), here = G0[k], hungry = a.e < TUNE.rFull;
+      if (hungry && here > .15) { sp = 5; const take = Math.min(here, TUNE.rEat * dt); G0[k] -= take; a.e += take * TUNE.rConv; a.a += gauss() * 2 * Math.sqrt(dt); }
+      else if (hungry) {
+        if (a.goal == null || Math.random() < dt * 2.5) { let best = -1, ba = a.a; for (let s = 0; s < 6; s++) { const an = a.a + rand(-1.7, 1.7), v = G0[ci(a.x + Math.cos(an) * 42, a.y + Math.sin(an) * 42)]; if (v > best) { best = v; ba = an; } } a.goal = ba; }
+        a.a = steer(a.a, a.goal, 3 * dt); sp = 30;
+      } else { a.a += gauss() * 1.6 * Math.sqrt(dt); sp = 16; }
+    }
+    const hm = hopMul(a, dt, sp); a.x += Math.cos(a.a) * sp * dt * hm; a.y += Math.sin(a.a) * sp * dt * hm; keepIn(a, box);
+    a.e -= ((a.hide > 0 ? TUNE.rMet * .6 : TUNE.rMet) + (a.inf > 0 ? 3 : 0)) * dt;
+    if (a.imm > 0) a.imm -= dt;
+    if (a.inf > 0) {
+      for (const o of R) { if (o !== a && o.inf <= 0 && o.imm <= 0 && (o.x - a.x) ** 2 + (o.y - a.y) ** 2 < 18 * 18 && Math.random() < 1.4 * dt) o.inf = 8; }
+      a.inf -= dt; if (a.inf <= 0) { if (Math.random() < .45) a.e = 0; else a.imm = 30; }
+    }
+    if (a.e > TUNE.rBirthE && Math.random() < TUNE.rBirthP * rbm * dt && R.length + born.length < ECO_CAP_R) { a.e *= .5; born.push(newEcoRabbit(a.x + rand(-6, 6), a.y + rand(-6, 6), a.e)); }
+    if (a.e <= 0 || a.age > a.life) { R.splice(i, 1); if (ECO.pings.length < 80) ECO.pings.push({ x: a.x, y: a.y, t: .9, T: .9, kind: 'death' }); }
+  }
+  if (born.length) { born.forEach(k => { keepIn(k, box); R.push(k); if (ECO.pings.length < 80) ECO.pings.push({ x: k.x, y: k.y, t: .6, T: .6, kind: 'birth' }); }); Sound.play('birth'); }
+  /* foxes: hunt visible rabbits, rest while digesting, breed by chance when well fed */
+  const fbm = [.5, .75, 1, 1.3, 1.6][val('eco-fb') - 1], hunt = FS[val('eco-fs') - 1], kits = [], vis2 = TUNE.fVision * TUNE.fVision;
+  for (let i = F.length - 1; i >= 0; i--) {
+    const f = F[i]; f.age += dt; f.ph += dt * (3 + (f.spd || 0) * .26); let sp;
+    if (f.rest > 0) { f.rest -= dt; f.a += gauss() * 1.2 * Math.sqrt(dt); sp = 8; }
+    else {
+      let best = null, bd = vis2; for (const a of R) { if (a.hide > 0) continue; const d2 = (a.x - f.x) ** 2 + (a.y - f.y) ** 2; if (d2 < bd) { bd = d2; best = a; } }
+      if (best) {
+        f.a = steer(f.a, Math.atan2(best.y - f.y, best.x - f.x), 6 * dt); sp = hunt;
+        if (bd < 10 * 10) { const k = R.indexOf(best); if (k >= 0) R.splice(k, 1); f.e += TUNE.fGain; f.rest = TUNE.fRest; if (ECO.pings.length < 80) ECO.pings.push({ x: best.x, y: best.y, t: .9, T: .9, kind: 'death' }); Sound.play('snap'); }
+      } else { f.a += gauss() * 1.5 * Math.sqrt(dt); sp = 26; }
+    }
+    f.spd = sp; f.x += Math.cos(f.a) * sp * dt; f.y += Math.sin(f.a) * sp * dt; keepIn(f, box, 8);
+    f.e -= (f.rest > 0 ? TUNE.fMet * .6 : TUNE.fMet) * dt;
+    if (f.e > TUNE.fBirthE && Math.random() < TUNE.fBirthP * fbm * dt * Math.max(0, 1 - (F.length + kits.length) / TUNE.fK) && F.length + kits.length < ECO_CAP_F) { f.e *= .5; kits.push(newFox(f.x + rand(-8, 8), f.y + rand(-8, 8), f.e)); }
+    if (f.e <= 0 || f.age > f.life) { F.splice(i, 1); if (ECO.pings.length < 80) ECO.pings.push({ x: f.x, y: f.y, t: .9, T: .9, kind: 'death' }); }
+  }
+  kits.forEach(k => { keepIn(k, box, 8); F.push(k); ECO.pings.push({ x: k.x, y: k.y, t: .6, T: .6, kind: 'birth' }); });
+  /* immigration: animals occasionally arrive from neighbouring meadows after a local extinction */
+  const migrate = $('#eco-migrate').checked;
+  ECO.goneR = R.length || !migrate ? 0 : ECO.goneR + dt; ECO.goneF = F.length || !migrate ? 0 : ECO.goneF + dt;
+  if (ECO.goneR > 25) { ECO.goneR = 0; for (let k = 0; k < 4; k++) R.push(newEcoRabbit(4, rand(20, box.h - 20), 55)); ECO.ev.push({ t: ECO.t, label: 'Blobs arrive' }); ecoBanner('Blobs died out here, but a few have arrived from a nearby meadow'); }
+  if (ECO.goneF > 40 && R.length > 60) { ECO.goneF = 0; for (let k = 0; k < 2; k++) F.push(newFox(box.w - 6, rand(20, box.h - 20), 55)); ECO.ev.push({ t: ECO.t, label: 'Foxes arrive' }); ecoBanner('Foxes died out here, but two have moved in from a nearby meadow'); }
+  if (ECO.t - ECO.lastRec >= .5) { ECO.lastRec = ECO.t; ecoRecord(); }
+}
+function ecoRender(dt) {
+  const { ctx: g, w, h } = ECO.st; if (!ECO.ready || w < 80) return;
+  const bm = BIOME[ECO.biome], d = ECO.img.data, G0 = ECO.grass, Bn = ECO.burn;
+  for (let i = 0; i < G0.length; i++) {
+    const b = G0[i]; let c0, c1, t;
+    if (b < .5) { c0 = bm.soil; c1 = bm.dry; t = b * 2; } else { c0 = bm.dry; c1 = bm.grass; t = (b - .5) * 2; }
+    let r = c0[0] + (c1[0] - c0[0]) * t, gg = c0[1] + (c1[1] - c0[1]) * t, bb = c0[2] + (c1[2] - c0[2]) * t;
+    if (Bn[i] > 0) { const k = clamp(Bn[i] / 5, 0, .85); r += (46 - r) * k; gg += (40 - gg) * k; bb += (34 - bb) * k; }
+    const j = i * 4; d[j] = r; d[j + 1] = gg; d[j + 2] = bb; d[j + 3] = 255;
+  }
+  ECO.offCtx.putImageData(ECO.img, 0, 0);
+  g.imageSmoothingEnabled = true; g.drawImage(ECO.off, 0, 0, ECO.cols * ECO.cell, ECO.rows * ECO.cell);
+  if (ECO.tex) { g.globalAlpha = .7; g.drawImage(ECO.tex.canvas, 0, 0, w, h); g.globalAlpha = 1; }
+  if (ECO.drought > 0) { g.fillStyle = 'rgba(230,190,90,.12)'; g.fillRect(0, 0, w, h); }
+  for (const b of ECO.burrows) { g.fillStyle = 'rgba(120,92,58,.75)'; ell(g, b.x + 2, b.y + 3, 15, 10); g.fillStyle = '#2A1E14'; ell(g, b.x, b.y, 7.5, 5.5); g.fillStyle = 'rgba(0,0,0,.35)'; ell(g, b.x, b.y + 1, 5, 3.5); }
+  let hidden = 0;
+  for (const a of ECO.rabbits) { if (a.hide > 0) { hidden++; continue; } drawRabbit(g, a.x, a.y, a.a, 6.4, { ph: a.ph, sick: a.inf > 0, hu: a.hu }); }
+  ECO.hiddenNow = hidden;
+  for (const f of ECO.foxes) drawFox(g, f.x, f.y, f.a, 8.6, { ph: f.ph, spd: f.spd });
+  drawPings(g, ECO.pings, dt);
+}
+function ecoUI() {
+  if (!ECO.ready) return;
+  const gc = ECO.grass.reduce((a, b) => a + b, 0) / ECO.grass.length * 100;
+  $('#eco-c-t').textContent = ECO.t.toFixed(0); $('#eco-c-r').textContent = ECO.rabbits.length; $('#eco-c-f').textContent = ECO.foxes.length; $('#eco-c-g').textContent = gc.toFixed(0) + '%';
+  const label = ECO.running ? 'Pause' : ECO.t > 0 ? 'Resume ecosystem' : 'Start ecosystem'; if ($('#eco-play').textContent !== label) $('#eco-play').textContent = label;
+}
+function ecoChart() {
+  if (!ECO.plot) return;
+  const H = ECO.hist; const tNow = ECO.t; const xmin = Math.max(0, tNow - 150), xmax = Math.max(xmin + 60, tNow + 2);
+  const vis = H.filter(p => p[0] >= xmin);
+  const ymax = Math.max(20, ...vis.map(p => p[1])) * 1.15, fmax = Math.max(8, ...vis.map(p => p[2])) * 1.3;
+  ECO.plot.draw({ xmin, xmax, ymin: 0, ymax, xlabel: 'Time', ylabel: 'Blobs', y2: { min: 0, max: fmax, label: 'Foxes' },
+    series: [
+      { points: vis.map(p => [p[0], p[3] / 100 * ymax]), color: TH.moss, width: 1.2, fill: .13, label: 'Grass cover (shading, top = 100%)' },
+      { points: vis.map(p => [p[0], p[1]]), color: TH.water, width: 2.6, label: 'Blobs (left axis)' },
+      { points: vis.map(p => [p[0], p[2]]), axis: 'y2', color: TH.tag, width: 2.6, label: 'Foxes (right axis)' }
+    ],
+    vlines: ECO.ev.filter(e => e.t >= xmin).map((e, i) => ({ x: e.t, label: e.label, color: TH.muted, row: i % 2 })) });
+}
+function ecoRows() { return [['Time', 'Blobs', 'Foxes', 'Grass cover %']].concat(ECO.hist.map(p => [p[0].toFixed(1), p[1], p[2], p[3].toFixed(1)])); }
+function ecoInit() {
+  ECO.st = makeStage($('#eco-canvas'), (ow, oh) => {
+    if (!ECO.ready) return; const fx = ECO.st.w / ow, fy = ECO.st.h / oh; ecoGrid();
+    ECO.rabbits.concat(ECO.foxes).forEach(a => { a.x *= fx; a.y *= fy; });
+  });
+  ECO.plot = new Plot($('#eco-chart'));
+  const lv = ['Very low', 'Low', 'Normal', 'High', 'Very high'];
+  buildSliders('#eco-sliders', [
+    { id: 'eco-grass', label: 'Grass growth rate', min: .2, max: 2, step: .1, val: 1, fmt: v => `${v.toFixed(1)}×`, hint: 'Primary producers set the food supply for everything else.' },
+    { id: 'eco-rb', label: 'Blob birth rate', min: 1, max: 5, step: 1, val: 3, fmt: v => lv[v - 1] },
+    { id: 'eco-fs', label: 'Fox hunting speed', min: 1, max: 5, step: 1, val: 3, fmt: v => ['Very slow', 'Slow', 'Normal', 'Fast', 'Very fast'][v - 1] },
+    { id: 'eco-fb', label: 'Fox birth rate', min: 1, max: 5, step: 1, val: 3, fmt: v => lv[v - 1] }
+  ]);
+  $('#eco-play').onclick = () => { ECO.running = !ECO.running; Sound.play('click'); ecoUI(); };
+  $('#eco-reset').onclick = ecoReset;
+  $$('#eco-biomes .pill').forEach(b => b.onclick = () => {
+    ECO.biome = b.dataset.biome; $$('#eco-biomes .pill').forEach(x => x.setAttribute('aria-pressed', x === b));
+    if (ECO.ready) { ECO.tex = paintTerrain(ECO.st.w, ECO.st.h, ECO.st.dpr, { seed: 41, pal: BIOME[ECO.biome].pal, overlay: true, density: 140, flowers: 5000 }); ECO.ev.push({ t: ECO.t, label: BIOME[ECO.biome].name }); ecoChart(); }
+  });
+  $$('#eco-tools .pill').forEach(b => b.onclick = () => { ECO.tool = b.dataset.tool; $$('#eco-tools .pill').forEach(x => x.setAttribute('aria-pressed', x === b)); });
+  $$('#eco-events .pill').forEach(b => b.onclick = () => { if (ECO.ready) ecoEvent(b.dataset.ev); });
+  const cv = ECO.st.canvas;
+  cv.addEventListener('pointerdown', e => { if (!ECO.ready) return; ECO.drag = true; try { cv.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ } ecoApply(e); });
+  cv.addEventListener('pointermove', e => { if (ECO.drag && performance.now() - ECO.lastApply > (ECO.tool === 'grass' || ECO.tool === 'remove' ? 40 : 110)) ecoApply(e); });
+  ['pointerup', 'pointercancel', 'pointerleave'].forEach(t => cv.addEventListener(t, () => { ECO.drag = false; }));
+  $('#eco-copy').onclick = () => copyRows(ecoRows());
+  $('#eco-csv').onclick = () => downloadRows('ecosystem-populations.csv', ecoRows());
+}
+
+/* =====================================================================
+   SLIDERS
+   ===================================================================== */
+const SLIDERS = {};
+function buildSliders(sel, defs) {
+  const host = $(sel);
+  defs.forEach(d => {
+    const wrap = document.createElement('div'); wrap.className = 'field';
+    wrap.innerHTML = `<div class="field-top"><label for="${d.id}">${d.label}</label><output id="${d.id}-out" for="${d.id}"></output></div><input type="range" id="${d.id}" min="${d.min}" max="${d.max}" step="${d.step}" value="${d.val}">${d.hint ? `<div class="field-hint">${d.hint}</div>` : ''}`;
+    host.appendChild(wrap);
+    const inp = wrap.querySelector('input'), out = wrap.querySelector('output');
+    d.paint = () => { const v = +inp.value; out.textContent = d.fmt ? d.fmt(v) : v; inp.style.setProperty('--p', ((v - d.min) / (d.max - d.min) * 100) + '%'); };
+    inp.addEventListener('input', () => { d.paint(); if (d.on) d.on(+inp.value); });
+    if (d.change) inp.addEventListener('change', () => d.change(+inp.value));
+    d.paint(); SLIDERS[d.id] = d;
+  });
+}
+function refreshSlider(id) { if (SLIDERS[id]) SLIDERS[id].paint(); }
+function setSlider(id, v) { const el = document.getElementById(id); if (!el) return; el.value = v; refreshSlider(id); }
+
+/* =====================================================================
+   BIOLOGY NOTES (principle, assumptions, limitations, demo ideas)
+   ===================================================================== */
+const NOTES = {
+  mr: {
+    p: 'Catch a sample, mark it and release it, then catch a second sample. If marked animals have mixed evenly, the fraction marked in the second sample (x/n) equals the fraction marked in the whole population (s/N). Rearranging gives N = (s × n) / x.',
+    a: ['The population is closed: no births, deaths, immigration or emigration between the two captures.', 'Marks are not lost and do not harm the animal or change how it behaves.', 'Marked animals mix randomly back into the population.', 'Every animal has the same chance of being caught.'],
+    l: ['Small samples give unstable estimates. When x is small, one extra recapture changes N a lot, and when x = 0 the formula cannot be used.', 'The simple formula tends to overestimate with small samples. Chapman’s version, (s+1)(n+1)/(x+1) − 1, reduces this bias.', 'Trap-shy animals make N too high; trap-happy animals make it too low.', 'Real populations are rarely completely closed.'],
+    d: ['Set Time before second capture to Same day: tagged blobs have not mixed and the estimate is far off.', 'Run one trial with Auto-play and explain each step as the formula fills in.', 'Tick “Hide the true population”, estimate it, then reveal it.', 'Run 100 trials with s = n = 20, then with s = n = 80, and compare the spread.', 'Set Trap response to trap-shy and show the estimate moving upward.']
+  },
+  exp: {
+    p: 'With unlimited resources, each individual reproduces at a constant per-capita rate r. Growth is proportional to population size, dN/dt = rN, so a bigger population grows faster and the curve bends upward into a J. Solving it gives N(t) = N₀e^(rt), and the doubling time is ln 2 / r.',
+    a: ['Unlimited food, water and space.', 'No predators, disease or competition.', 'The birth rate b and death rate d stay constant, so r = b − d does not change.', 'No migration, and every individual is the same.'],
+    l: ['Pure exponential growth rarely lasts: resources run out as the population grows.', 'Crowding brings density-dependent factors such as competition, disease and predation.', 'It only fits short periods, such as bacteria in fresh medium or a species colonising a new habitat.', 'Example: in 1859, two dozen European rabbits were released in Australia. With plenty of food and few predators they spread across much of the continent within decades.'],
+    d: ['Keep N₀ and d the same and compare b = 0.3, 0.5 and 0.7. When r doubles, the doubling time halves.', 'Set d higher than b: the same model now predicts decline.', 'Switch on Log scale: exponential growth becomes a straight line.', 'Compare the simulated doubling time with ln 2 / r in the table.', 'Let a run hit 20,000 and ask: what would stop this in a real meadow?']
+  },
+  log: {
+    p: 'Real environments have limited resources. As N rises, crowding lowers the birth rate and raises the death rate (graph 3); at K they are equal, so growth stops. The term (K − N)/K is the share of the carrying capacity still free: close to 1 when N is small (almost exponential growth) and 0 when N = K (no net growth). Growth is fastest at N = K/2.',
+    a: ['The environment has a fixed carrying capacity K.', 'Crowding slows growth smoothly and immediately as N rises.', 'r and K stay constant over time.', 'All individuals are the same, with no age structure.'],
+    l: ['Real carrying capacities change with seasons, weather and human activity. Try Drought.', 'Real populations often overshoot K and oscillate because of time lags.', 'The model ignores chance events and interactions with other species.', 'At K, births and deaths still happen. They just balance.', 'In this tab K is set directly; the grazed ground only shows how crowded the meadow is. The Whole ecosystem tab shows a limit emerging from real food.'],
+    d: ['Point to graph 2: the peak growth rate is at K/2.', 'Trigger a Drought mid-run and show N falling to the new K.', 'Compare the jagged simulated line with the smooth prediction.', 'Change r and show that K stays the same, only the speed changes.']
+  },
+  eco: {
+    p: 'Carrying capacity is not a fixed number from nowhere: it comes from resources. Here grass is the limited resource for blobs, and blobs are the food for foxes. Each population limits the next, so numbers rise and fall in linked cycles.',
+    a: ['Blobs only eat grass and foxes only eat blobs.', 'Burrows (prey refuges), fox territories and arrivals from nearby meadows are built in. Without refuges, predator–prey systems in a small area often crash.', 'Animals reproduce once they have stored enough energy, and die if they starve or reach old age.', 'Grass regrows at a set rate unless there is drought or fire.'],
+    l: ['Real food webs contain many more species and links.', 'There are no seasons, burrows or territories.', 'Small populations can die out by chance.'],
+    d: ['Watch the chart: fox numbers peak after blob numbers do.', 'Trigger a drought and follow the effect up the food chain.', 'Untick “Animals can move in” and remove every fox. Blobs overshoot the grass supply and crash, showing why real populations often swing around K instead of settling smoothly.']
+  }
+};
+function renderNotes() {
+  Object.entries(NOTES).forEach(([k, n]) => {
+    const li = arr => '<ul>' + arr.map(x => `<li>${x}</li>`).join('') + '</ul>';
+    $(`#${k}-notes`).innerHTML = `<div class="card"><h4>Principle</h4><p>${n.p}</p></div><div class="card"><h4>Assumptions</h4>${li(n.a)}</div><div class="card"><h4>Limitations</h4>${li(n.l)}</div><div class="card demo"><h4>Ideas for your demo</h4>${li(n.d)}</div>`;
+  });
+}
+
+/* =====================================================================
+   TABS, KEYBOARD, TOUR, THEME
+   ===================================================================== */
+const TABS = {
+  mr: { tick: mrTick, render: mrRender, ui: mrUI, charts: () => {}, primary: () => { if (!$('#mr-next').disabled) mrNext(); }, reset: () => mrNewPopulation() },
+  exp: { tick: expTick, render: expRender, ui: expUI, charts: expChart, primary: expToggle, reset: () => expReset(true) },
+  log: { tick: logTick, render: logRender, ui: logUI, charts: logCharts, primary: logToggle, reset: logReset },
+  eco: { tick: ecoTick, render: ecoRender, ui: ecoUI, charts: ecoChart, primary: () => { ECO.running = !ECO.running; ecoUI(); }, reset: ecoReset }
+};
+function switchTab(id) {
+  if (!TABS[id]) return; G.tab = id;
+  $$('#tabs [role=tab]').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === id));
+  $$('.tabpanel').forEach(p => { p.hidden = p.id !== 'tab-' + id; });
+  [MR.st, EXP.st, LOG.st, ECO.st].forEach(s => s && s.fit());
+  [MR.plot, EXP.plot, ECO.plot, LOG.plots.a, LOG.plots.b, LOG.plots.c].forEach(p => p && p.st.fit());
+  try { history.replaceState(null, '', '#' + id); } catch (e) { /* sandboxed */ }
+  TABS[id].ui(); TABS[id].charts();
+}
+const TOUR = [
+  { tab: 'mr', sel: '#tabs', where: 'Welcome', title: 'Four simulations in one site', text: 'Tabs 1 to 3 are Options 1 to 3 from the project sheet. Tab 4 is an extension that links them together. You can also press the number keys 1 to 4.' },
+  { tab: 'mr', sel: '#globals', where: 'Welcome', title: 'Speed, sound, dark mode and presentation mode', text: 'Speed up any simulation to 2× or 4×, mute sound effects, or switch to dark mode. Presentation mode hides the notes and tables and enlarges everything for the projector (press P). You can restart this tour from here any time.' },
+  { tab: 'mr', sel: '#tab-mr .intro', where: 'Option 1: Mark–recapture', title: 'The question', text: 'How do you count animals that hide? You catch some, tag them, let them go, then see how many tagged ones turn up in a second catch.' },
+  { tab: 'mr', sel: '#mr-steps', where: 'Option 1: Mark–recapture', title: 'The five steps', text: 'This bar shows where you are in the method. The current step is highlighted in green.' },
+  { tab: 'mr', sel: '#mr-stage', where: 'Option 1: Mark–recapture', title: 'Watch a trial', text: 'I have started an automatic trial for you. Blobs hop into the metal traps, go to the holding pen, get a gold tag, then are released and caught again.', act: () => { if (MR.phase === 'done') mrNext(); if (!MR.auto) { MR.auto = true; MR.autoT = .5; mrUI(); } } },
+  { tab: 'mr', sel: '#mr-actions', where: 'Option 1: Mark–recapture', title: 'Do it yourself', text: 'The green button takes one step at a time so you can explain each one. Auto-play runs the whole trial. New population starts a fresh meadow.' },
+  { tab: 'mr', sel: '#mr-formula', where: 'Option 1: Mark–recapture', title: 'The formula fills itself in', text: 'As the trial runs, the real values of s, n and x are put into N = (s × n) / x. Each letter has its own colour, matching the results card.' },
+  { tab: 'mr', sel: '#mr-settings', where: 'Option 1: Mark–recapture', title: 'Field settings', text: 'Change the true population and both sample sizes. Time before second capture controls how well tagged blobs mix: set it to Same day and the estimate goes badly wrong. Trap response breaks another assumption.' },
+  { tab: 'mr', sel: '#mr-trial-card', where: 'Option 1: Mark–recapture', title: 'This trial’s results', text: 'Your estimate is compared with the true number. Green error means within 10%; red means further off.' },
+  { tab: 'mr', sel: '#mr-batch-card', where: 'Option 1: Mark–recapture', title: 'Repeated trials and sampling error', text: 'I have just run 100 trials for you. The histogram shows how much the estimate varies purely by chance. Try small samples, then big ones.', act: () => { if (!MR.batch) mrBatch(); } },
+  { tab: 'mr', sel: '#mr-log-card', where: 'Option 1: Mark–recapture', title: 'Trial log', text: 'Every finished trial is saved here. Copy pastes straight into Excel or Google Sheets for your data analyst.' },
+  { tab: 'mr', sel: '#mr-notes', where: 'Option 1: Mark–recapture', title: 'Biology notes', text: 'The principle, assumptions and limitations are written out for your biology lead, plus ideas for the live demo.' },
+  { tab: 'exp', sel: '#exp-stage', where: 'Option 2: Exponential growth', title: 'A population with no limits', text: 'I have started the growth. With unlimited food, every blob keeps reproducing, so the population grows faster and faster.', act: () => { if (!EXP.running && !EXP.ended) expToggle(); } },
+  { tab: 'exp', sel: '#exp-side', where: 'Option 2: Exponential growth', title: 'Formula and controls', text: 'dN/dt = (b − d)N is filled in with live numbers. Change N₀, the birth rate b and the death rate d; r = b − d. Set d higher than b and the population shrinks instead.' },
+  { tab: 'exp', sel: '#exp-chart-card', where: 'Option 2: Exponential growth', title: 'The J-curve', text: 'The solid line is the simulation and the dashed line is the N₀e^(rt) prediction. Tick Log scale to turn the J-curve into a straight line.' },
+  { tab: 'exp', sel: '#exp-table-card', where: 'Option 2: Exponential growth', title: 'Compare growth rates', text: 'Each time you press Reset, the run is saved here and as a faded curve, so you can compare different values of r side by side.' },
+  { tab: 'log', sel: '#log-stage', where: 'Option 3: Logistic growth', title: 'A population with limits', text: 'I have started this one too. Watch the grass get grazed down as the population approaches the carrying capacity, K. The badge in the corner tells you what is happening.', act: () => { if (!LOG.running && !LOG.extinct) logToggle(); } },
+  { tab: 'log', sel: '#log-formula', where: 'Option 3: Logistic growth', title: 'The logistic formula', text: 'The (K − N)/K part is the room left to grow. As N gets close to K it shrinks towards 0, so growth slows down.' },
+  { tab: 'log', sel: '#log-events', where: 'Option 3: Logistic growth', title: 'Change the environment', text: 'Drought and Good season change K mid-run. The population follows the new carrying capacity, which is great to show live.' },
+  { tab: 'log', sel: '#log-charts', where: 'Option 3: Logistic growth', title: 'Three graphs for analysis', text: 'Population against time, growth rate against N (peaks at K/2), and birth and death rates per blob, which cross at K. That crossing is why the population stops growing.' },
+  { tab: 'eco', sel: '#eco-toolbar', where: 'Extension: whole ecosystem', title: 'Habitats, tools and events', text: 'Pick a habitat, choose what clicking does, and trigger droughts, wildfires or disease.' },
+  { tab: 'eco', sel: '#eco-stage', where: 'Extension: whole ecosystem', title: 'Grass, blobs and foxes', text: 'I have started the ecosystem. Blobs eat grass and hide in burrows; foxes hunt the blobs. Click on the meadow to add more.', act: () => { if (!ECO.running) { ECO.running = true; ecoUI(); } } },
+  { tab: 'eco', sel: '#eco-chart-card', where: 'Extension: whole ecosystem', title: 'Linked cycles', text: 'Blob numbers are on the left axis, foxes on the right, and grass is the green shading. Notice the fox peaks come after the blob peaks.' },
+  { tab: 'eco', sel: '#site-footer', where: 'All done', title: 'You have seen everything', text: 'Shortcuts: 1 to 4 switch tabs, Space starts or steps, R resets. Every table has Copy and Download CSV. Have fun with the demo!' }
+];
+let tourI = -1;
+function tourPlace() {
+  if (tourI < 0) return;
+  const el = $(TOUR[tourI].sel), spot = $('#tour-spot'), card = $('#tour');
+  const vw = window.innerWidth, vh = window.innerHeight, pad = 6;
+  if (!el) { spot.hidden = true; card.style.left = Math.max(12, (vw - card.offsetWidth) / 2) + 'px'; card.style.top = Math.max(12, vh - card.offsetHeight - 16) + 'px'; return; }
+  const r = el.getBoundingClientRect(); spot.hidden = false;
+  spot.style.left = (r.left - pad) + 'px'; spot.style.top = (r.top - pad) + 'px'; spot.style.width = (r.width + pad * 2) + 'px'; spot.style.height = (r.height + pad * 2) + 'px';
+  const cw = card.offsetWidth || 380, ch = card.offsetHeight || 200, gap = 14;
+  let top, left = clamp(r.left, 12, vw - cw - 12);
+  if (r.bottom + gap + ch < vh - 8) top = r.bottom + gap;
+  else if (r.top - gap - ch > 8) top = r.top - gap - ch;
+  else if (r.right + gap + cw < vw - 8) { left = r.right + gap; top = clamp(r.top, 12, vh - ch - 12); }
+  else if (r.left - gap - cw > 8) { left = r.left - gap - cw; top = clamp(r.top, 12, vh - ch - 12); }
+  else top = vh - ch - 16;
+  card.style.left = left + 'px'; card.style.top = clamp(top, 8, vh - ch - 8) + 'px';
+}
+function tourShow(i) {
+  if (i < 0 || i >= TOUR.length) { tourI = -1; $('#tour').hidden = true; $('#tour-spot').hidden = true; return; }
+  tourI = i; const s = TOUR[i]; if (G.tab !== s.tab) switchTab(s.tab);
+  $('#tour').hidden = false; $('#tour-where').textContent = s.where; $('#tour-title').textContent = s.title; $('#tour-text').textContent = s.text;
+  $('#tour-count').textContent = `${i + 1} of ${TOUR.length}`; $('#tour-bar').style.width = ((i + 1) / TOUR.length * 100) + '%';
+  $('#tour-prev').disabled = i === 0; $('#tour-next').textContent = i === TOUR.length - 1 ? 'Finish' : 'Next';
+  if (s.act) { try { s.act(); } catch (e) { console.error(e); } }
+  const el = $(s.sel);
+  if (el) { const tall = el.getBoundingClientRect().height > window.innerHeight * .6; try { el.scrollIntoView({ behavior: 'smooth', block: tall ? 'start' : 'center' }); } catch (e) { el.scrollIntoView(); } }
+  tourPlace();
+}
+function togglePresent() {
+  const on = !document.body.classList.contains('present'); document.body.classList.toggle('present', on);
+  const b = $('#presentBtn'); b.setAttribute('aria-pressed', on); b.textContent = on ? 'Exit presentation' : 'Presentation mode';
+  toast(on ? 'Presentation mode: notes and tables hidden, text enlarged. Press P to exit.' : 'Presentation mode off');
+  setTimeout(() => { [MR.st, EXP.st, LOG.st, ECO.st].forEach(s => s && s.fit()); TABS[G.tab].charts(); }, 50);
+}
+function setTheme(mode) {
+  if (mode) document.documentElement.setAttribute('data-theme', mode);
+  readTheme();
+  const dark = document.documentElement.getAttribute('data-theme') === 'dark' || (!document.documentElement.getAttribute('data-theme') && window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches);
+  $('#themeBtn').textContent = dark ? 'Light mode' : 'Dark mode';
+  mrBatchUI(); TABS[G.tab].charts();
+}
+
+/* =====================================================================
+   MAIN LOOP — only the visible simulation runs
+   ===================================================================== */
+function frame(now) {
+  if (G.last == null) G.last = now;
+  const raw = Math.min(.05, Math.max(0, (now - G.last) / 1000)); G.last = now;
+  const dt = raw * G.speed, T = TABS[G.tab];
+  try {
+    const steps = dt > .06 ? 2 : 1; for (let i = 0; i < steps; i++) T.tick(dt / steps);
+    T.render(raw);
+    G.uiT += raw; if (G.uiT > .12) { G.uiT = 0; T.ui(); }
+    G.chartT += raw; if (G.chartT > .2) { G.chartT = 0; T.charts(); }
+    if (tourI >= 0) tourPlace();
+  } catch (err) { console.error(err); }
+  requestAnimationFrame(frame);
+}
+
+function init() {
+  readTheme();
+  mrInit(); expInit(); logInit(); ecoInit(); renderNotes();
+  $$('#tabs [role=tab]').forEach(b => b.onclick = () => switchTab(b.dataset.tab));
+  $$('#speedSeg button').forEach(b => b.onclick = () => { G.speed = +b.dataset.speed; $$('#speedSeg button').forEach(x => x.classList.toggle('on', x === b)); });
+  $('#soundBtn').onclick = e => { G.sound = !G.sound; e.target.textContent = G.sound ? 'Sound on' : 'Sound off'; e.target.setAttribute('aria-pressed', G.sound); };
+  $('#themeBtn').onclick = () => { const dark = $('#themeBtn').textContent === 'Light mode'; setTheme(dark ? 'light' : 'dark'); };
+  if (window.matchMedia) { const mq = matchMedia('(prefers-color-scheme: dark)'); const f = () => { if (!document.documentElement.getAttribute('data-theme')) setTheme(); }; if (mq.addEventListener) mq.addEventListener('change', f); }
+  $('#presentBtn').onclick = togglePresent;
+  $('#tourBtn').onclick = () => tourShow(0);
+  window.addEventListener('resize', tourPlace); window.addEventListener('scroll', tourPlace, { passive: true });
+  $('#tour-next').onclick = () => tourShow(tourI + 1);
+  $('#tour-prev').onclick = () => tourShow(tourI - 1);
+  $('#tour-close').onclick = () => tourShow(-1);
+  document.addEventListener('keydown', e => {
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    const tag = (e.target.tagName || '').toLowerCase(); if (tag === 'select' || tag === 'textarea' || (tag === 'input' && e.target.type !== 'range' && e.target.type !== 'checkbox')) return;
+    if (e.key === 'Escape' && tourI >= 0) { tourShow(-1); return; }
+    if (tourI >= 0 && e.key === 'ArrowRight') { tourShow(tourI + 1); return; }
+    if (tourI >= 0 && e.key === 'ArrowLeft') { tourShow(tourI - 1); return; }
+    if (['1', '2', '3', '4'].includes(e.key)) { switchTab(['mr', 'exp', 'log', 'eco'][+e.key - 1]); return; }
+    if (e.key === ' ' && tag !== 'button') { e.preventDefault(); TABS[G.tab].primary(); return; }
+    if (e.key === 'r' || e.key === 'R') TABS[G.tab].reset();
+    if (e.key === 'p' || e.key === 'P') togglePresent();
+  });
+  setTheme();
+  const h = (location.hash || '').slice(1); switchTab(TABS[h] ? h : 'mr');
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { readTheme(); MR.bg = null; TABS[G.tab].charts(); mrBatchUI(); });
+  requestAnimationFrame(frame);
+}
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+
+
+</script>
+</body>
+</html>
